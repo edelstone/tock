@@ -7,7 +7,7 @@ Super-minimal menubar timer with quick parsing, stopwatch mode, and a repeating 
 ## Features
 
 - Menubar timer shows countdown or stopwatch time with monospaced digits.
-- Single input field: `10`, `5m`, `1.5h`, `45 sec`, etc. (defaults to minutes when unit is omitted).
+- Single input field with natural-language inputs: `10`, `5m`, `1.5h`, `45 sec`, etc. (defaults to minutes when unit is omitted).
 - Countdown stays at `00:00:00` when finished, with controls still enabled.
 - Countdown alarm repeats up to 10 times or until cleared.
 - Stopwatch mode when no countdown is running (or after a countdown finishes).
@@ -47,4 +47,4 @@ Super-minimal menubar timer with quick parsing, stopwatch mode, and a repeating 
 - Custom chime + volume control
 - Recent durations / favorites
 - Notification banner on finish
-- Pomodoro presets
+- Website and dowwnloads
