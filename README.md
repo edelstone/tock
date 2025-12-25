@@ -4,6 +4,8 @@
 
 Super-minimal menubar timer with quick parsing, stopwatch mode, and a repeating chime.
 
+Inspired by [Horo](https://matthewpalmer.net/horo-free-timer-mac/), but even more minimal.
+
 ## Features
 
 - Menubar timer shows countdown or stopwatch time with monospaced digits.
