@@ -1,0 +1,251 @@
+// !$*UTF8*$!
+{
+  archiveVersion = 1;
+  classes = {
+  };
+  objectVersion = 56;
+  objects = {
+
+/* Begin PBXBuildFile section */
+	AAAABBBB0000000000000011 /* TockApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 222222220000000000000008 /* TockApp.swift */; };
+	AAAABBBB0000000000000012 /* TockModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 333333330000000000000009 /* TockModel.swift */; };
+	AAAABBBB0000000000000013 /* TockMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44444444000000000000000A /* TockMenuView.swift */; };
+	AAAABBBB0000000000000014 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 55555555000000000000000B /* Assets.xcassets */; };
+	AAAABBBB0000000000000015 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 77777777000000000000000D /* Preview Assets.xcassets */; };
+	AAAABBBB0000000000000016 /* chime.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 121212120000000000000012 /* chime.mp3 */; };
+	AAAABBBB0000000000000017 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 131313130000000000000013 /* AppDelegate.swift */; };
+	AAAABBBB0000000000000018 /* MenuDismissAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 141414140000000000000014 /* MenuDismissAction.swift */; };
+	AAAABBBB0000000000000019 /* AppIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 151515150000000000000015 /* AppIcon.icns */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+	222222220000000000000008 /* TockApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TockApp.swift; sourceTree = "<group>"; };
+	333333330000000000000009 /* TockModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TockModel.swift; sourceTree = "<group>"; };
+	44444444000000000000000A /* TockMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TockMenuView.swift; sourceTree = "<group>"; };
+	131313130000000000000013 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+	141414140000000000000014 /* MenuDismissAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuDismissAction.swift; sourceTree = "<group>"; };
+	55555555000000000000000B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+	77777777000000000000000D /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+	88888888000000000000000E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+	99999999000000000000000F /* Tock.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; path = Tock.app; sourceTree = BUILT_PRODUCTS_DIR; };
+	121212120000000000000012 /* chime.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "Sounds/chime.mp3"; sourceTree = "<group>"; };
+	151515150000000000000015 /* AppIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = AppIcon.icns; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+    111111110000000000000007 /* Frameworks */ = {
+      isa = PBXFrameworksBuildPhase;
+      buildActionMask = 2147483647;
+      files = (
+      );
+      runOnlyForDeploymentPostprocessing = 0;
+    };
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+	ABCDEFAB0000000000000010 /* Tock */ = {
+		isa = PBXGroup;
+		children = (
+			222222220000000000000008 /* TockApp.swift */,
+			131313130000000000000013 /* AppDelegate.swift */,
+			333333330000000000000009 /* TockModel.swift */,
+			44444444000000000000000A /* TockMenuView.swift */,
+			141414140000000000000014 /* MenuDismissAction.swift */,
+			151515150000000000000015 /* AppIcon.icns */,
+			121212120000000000000012 /* chime.mp3 */,
+			55555555000000000000000B /* Assets.xcassets */,
+			66666666000000000000000C /* Preview Content */,
+			88888888000000000000000E /* Info.plist */,
+		);
+      path = Tock;
+      sourceTree = "<group>";
+    };
+    66666666000000000000000C /* Preview Content */ = {
+      isa = PBXGroup;
+      children = (
+        77777777000000000000000D /* Preview Assets.xcassets */,
+      );
+      path = "Preview Content";
+      sourceTree = "<group>";
+    };
+    BBBBBBBB0000000000000002 = {
+      isa = PBXGroup;
+      children = (
+        ABCDEFAB0000000000000010 /* Tock */,
+        CCCCCCCC0000000000000003 /* Products */,
+      );
+      sourceTree = "<group>";
+    };
+    CCCCCCCC0000000000000003 /* Products */ = {
+      isa = PBXGroup;
+      children = (
+		99999999000000000000000F /* Tock.app */,
+      );
+      name = Products;
+      sourceTree = "<group>";
+    };
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+    DDDDDDDD0000000000000004 /* Tock */ = {
+      isa = PBXNativeTarget;
+      buildConfigurationList = C2C2C2C200000000000000C2 /* Build configuration list for PBXNativeTarget "Tock" */;
+      buildPhases = (
+        EEEEEEEE0000000000000005 /* Sources */,
+        FFFFFFFF0000000000000006 /* Resources */,
+        111111110000000000000007 /* Frameworks */,
+      );
+      buildRules = (
+      );
+      dependencies = (
+      );
+      name = Tock;
+      productName = Tock;
+      productReference = 99999999000000000000000F /* Tock.app */;
+      productType = "com.apple.product-type.application";
+    };
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+    AAAAAAAA0000000000000001 /* Project object */ = {
+      isa = PBXProject;
+      attributes = {
+        BuildIndependentTargetsInParallel = 1;
+        LastSwiftUpdateCheck = 1500;
+        LastUpgradeCheck = 1500;
+      };
+      buildConfigurationList = C1C1C1C100000000000000C1 /* Build configuration list for PBXProject "Tock" */;
+      compatibilityVersion = "Xcode 14.0";
+      developmentRegion = en;
+      hasScannedForEncodings = 0;
+      mainGroup = BBBBBBBB0000000000000002;
+      productRefGroup = CCCCCCCC0000000000000003 /* Products */;
+      projectDirPath = "";
+      projectRoot = "";
+      targets = (
+        DDDDDDDD0000000000000004 /* Tock */,
+      );
+    };
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+	FFFFFFFF0000000000000006 /* Resources */ = {
+		isa = PBXResourcesBuildPhase;
+		buildActionMask = 2147483647;
+		files = (
+			AAAABBBB0000000000000014 /* Assets.xcassets in Resources */,
+			AAAABBBB0000000000000015 /* Preview Assets.xcassets in Resources */,
+			AAAABBBB0000000000000016 /* chime.mp3 in Resources */,
+			AAAABBBB0000000000000019 /* AppIcon.icns in Resources */,
+		);
+		runOnlyForDeploymentPostprocessing = 0;
+	};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+    EEEEEEEE0000000000000005 /* Sources */ = {
+      isa = PBXSourcesBuildPhase;
+      buildActionMask = 2147483647;
+      files = (
+        AAAABBBB0000000000000011 /* TockApp.swift in Sources */,
+        AAAABBBB0000000000000017 /* AppDelegate.swift in Sources */,
+        AAAABBBB0000000000000012 /* TockModel.swift in Sources */,
+        AAAABBBB0000000000000013 /* TockMenuView.swift in Sources */,
+        AAAABBBB0000000000000018 /* MenuDismissAction.swift in Sources */,
+      );
+      runOnlyForDeploymentPostprocessing = 0;
+    };
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+    C3C3C3C300000000000000C3 /* Debug */ = {
+      isa = XCBuildConfiguration;
+		buildSettings = {
+			ALWAYS_SEARCH_USER_PATHS = NO;
+			CODE_SIGN_STYLE = Automatic;
+			CURRENT_PROJECT_VERSION = 1;
+			DEVELOPMENT_TEAM = "";
+			ENABLE_HARDENED_RUNTIME = YES;
+			INFOPLIST_FILE = Tock/Info.plist;
+			MACOSX_DEPLOYMENT_TARGET = 14.0;
+			PRODUCT_BUNDLE_IDENTIFIER = com.michaeledelstone.tock;
+			PRODUCT_NAME = Tock;
+			SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			SWIFT_VERSION = 5.0;
+		};
+      name = Debug;
+    };
+    C4C4C4C400000000000000C4 /* Release */ = {
+      isa = XCBuildConfiguration;
+		buildSettings = {
+			ALWAYS_SEARCH_USER_PATHS = NO;
+			CODE_SIGN_STYLE = Automatic;
+			CURRENT_PROJECT_VERSION = 1;
+			DEVELOPMENT_TEAM = "";
+			ENABLE_HARDENED_RUNTIME = YES;
+        INFOPLIST_FILE = Tock/Info.plist;
+        MACOSX_DEPLOYMENT_TARGET = 14.0;
+        PRODUCT_BUNDLE_IDENTIFIER = com.michaeledelstone.tock;
+        PRODUCT_NAME = Tock;
+        SWIFT_VERSION = 5.0;
+      };
+      name = Release;
+    };
+    C5C5C5C500000000000000C5 /* Debug */ = {
+      isa = XCBuildConfiguration;
+		buildSettings = {
+			ALWAYS_SEARCH_USER_PATHS = NO;
+			CODE_SIGN_STYLE = Automatic;
+			CURRENT_PROJECT_VERSION = 1;
+			DEVELOPMENT_TEAM = "";
+			ENABLE_HARDENED_RUNTIME = YES;
+			INFOPLIST_FILE = Tock/Info.plist;
+			MACOSX_DEPLOYMENT_TARGET = 14.0;
+			PRODUCT_BUNDLE_IDENTIFIER = com.michaeledelstone.tock;
+			PRODUCT_NAME = Tock;
+			SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			SWIFT_VERSION = 5.0;
+		};
+      name = Debug;
+    };
+    C6C6C6C600000000000000C6 /* Release */ = {
+      isa = XCBuildConfiguration;
+		buildSettings = {
+			ALWAYS_SEARCH_USER_PATHS = NO;
+			CODE_SIGN_STYLE = Automatic;
+			CURRENT_PROJECT_VERSION = 1;
+			DEVELOPMENT_TEAM = "";
+        ENABLE_HARDENED_RUNTIME = YES;
+        INFOPLIST_FILE = Tock/Info.plist;
+        MACOSX_DEPLOYMENT_TARGET = 14.0;
+        PRODUCT_BUNDLE_IDENTIFIER = com.michaeledelstone.tock;
+        PRODUCT_NAME = Tock;
+        SWIFT_VERSION = 5.0;
+      };
+      name = Release;
+    };
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+    C1C1C1C100000000000000C1 /* Build configuration list for PBXProject "Tock" */ = {
+      isa = XCConfigurationList;
+      buildConfigurations = (
+        C3C3C3C300000000000000C3 /* Debug */,
+        C4C4C4C400000000000000C4 /* Release */,
+      );
+      defaultConfigurationIsVisible = 0;
+      defaultConfigurationName = Debug;
+    };
+    C2C2C2C200000000000000C2 /* Build configuration list for PBXNativeTarget "Tock" */ = {
+      isa = XCConfigurationList;
+      buildConfigurations = (
+        C5C5C5C500000000000000C5 /* Debug */,
+        C6C6C6C600000000000000C6 /* Release */,
+      );
+      defaultConfigurationIsVisible = 0;
+      defaultConfigurationName = Debug;
+    };
+/* End XCConfigurationList section */
+  };
+  rootObject = AAAAAAAA0000000000000001 /* Project object */;
+}
