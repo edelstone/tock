@@ -2,7 +2,11 @@
 
 This repo includes a GitHub Actions workflow that builds an unsigned DMG on tag pushes and uploads it to a GitHub Release. (Unsigned means macOS may warn on first launch.)
 
-Ensure the `Tock` scheme is shared in Xcode (Manage Schemes → Shared). This is a one-time setup; skip if it is already shared.
+Prereqs:
+
+- Xcode installed (for local builds).
+- The `Tock` scheme is shared in Xcode (Manage Schemes → Shared). This is a one-time setup; skip if it is already shared.
+- GitHub CLI (`gh`) installed if you want to publish release notes from the terminal.
 
 Before tagging, make sure all release changes are committed and pushed, then:
 
@@ -10,6 +14,7 @@ Before tagging, make sure all release changes are committed and pushed, then:
 1. Push the tag: `git push origin v0.1.0`
 1. Optional: add GitHub Release notes with the CLI (supports bullet lists):
    - `gh release create v0.1.0 --notes $'Highlights:\n- First item\n- Second item'`
+1. Optional: download the GitHub Release DMG and smoke test it (CI artifact that users get).
 
 ## Personal dev workflow
 

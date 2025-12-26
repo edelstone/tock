@@ -1,0 +1,8 @@
+---
+---
+
+@import "{{ site.theme }}";
+
+.container-lg > h1:first-of-type {
+  display: none;
+}
