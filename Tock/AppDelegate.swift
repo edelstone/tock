@@ -75,7 +75,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
       model.$elapsed.map { _ in () },
       model.$isRunning.map { _ in () }
     )
-      .sink { [weak self] _ in self?.updateStatusItem() }
+      .sink { [weak self] _ in
+        DispatchQueue.main.async {
+          self?.updateStatusItem()
+        }
+      }
       .store(in: &cancellables)
   }
 

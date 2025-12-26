@@ -32,7 +32,7 @@ final class TockModel: ObservableObject {
     case .stopwatch:
       total = max(0, Int(elapsed.rounded()))
     case .countdown:
-      total = max(0, Int(remaining.rounded()))
+      total = max(0, Int(ceil(remaining)))
     }
     let hours = total / 3600
     let minutes = (total % 3600) / 60
