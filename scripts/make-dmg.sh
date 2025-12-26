@@ -36,6 +36,9 @@ if [[ -f "${OUT_PATH}" ]]; then
   rm -f "${OUT_PATH}"
 fi
 
+touch "build/.metadata_never_index" 2>/dev/null || true
+touch "build/Build/.metadata_never_index" 2>/dev/null || true
+
 hdiutil create \
   -volname "${VOLUME_NAME}" \
   -srcfolder "${STAGING_DIR}" \

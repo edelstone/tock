@@ -8,6 +8,7 @@ DerivedData/
 *.xcodeproj/xcuserdata/
 *.xcworkspace/xcuserdata/
 build/
+dist/
 *.ipa
 *.dSYM.zip
 *.dSYM
