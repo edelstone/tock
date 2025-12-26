@@ -21,7 +21,7 @@ final class TockModel: ObservableObject {
   private var alarmPlayer: AVAudioPlayer?
   private var alarmRepeatTimer: Timer?
   private var alarmRepeatCount = 0
-  private let alarmRepeatLimit = 10
+  private var alarmRepeatLimit: Int?
   private let timerInterval: TimeInterval = 0.25
   private let timerTolerance: TimeInterval = 0.05
   private let alarmMinInterval: TimeInterval = 0.1
@@ -127,14 +127,16 @@ final class TockModel: ObservableObject {
 
     let multiplier: Double
     switch unitPart {
-    case "", "m", "min", "mins", "minute", "minutes":
+    case "m", "min", "mins", "minute", "minutes":
       multiplier = 60
     case "s", "sec", "secs", "second", "seconds":
       multiplier = 1
     case "h", "hr", "hrs", "hour", "hours":
       multiplier = 3600
+    case "":
+      multiplier = currentDefaultUnit().multiplier
     default:
-      multiplier = 60
+      multiplier = currentDefaultUnit().multiplier
     }
 
     return max(0, value * multiplier)
@@ -180,22 +182,31 @@ final class TockModel: ObservableObject {
   private func startAlarm() {
     stopAlarm()
     alarmRepeatCount = 0
+    alarmRepeatLimit = currentRepeatLimit()
 
-    guard let url = Bundle.main.url(forResource: "chime", withExtension: "mp3") else {
+    let tone = currentTone()
+    guard let url = Bundle.main.url(forResource: tone.rawValue, withExtension: "wav") else {
       NSSound(named: "Glass")?.play()
       return
     }
 
     do {
       let player = try AVAudioPlayer(contentsOf: url)
+      let volume = currentVolume()
+      player.volume = volume.level
       alarmPlayer = player
       player.play()
       alarmRepeatCount = 1
 
+      guard alarmRepeatLimit != 1 else {
+        return
+      }
+
       let interval = max(alarmMinInterval, player.duration)
       let repeatTimer = Timer(timeInterval: interval, repeats: true) { [weak self] _ in
         guard let self else { return }
-        if self.alarmRepeatCount >= self.alarmRepeatLimit {
+        if let alarmRepeatLimit = self.alarmRepeatLimit,
+           self.alarmRepeatCount >= alarmRepeatLimit {
           self.stopAlarm()
           return
         }
@@ -217,5 +228,29 @@ final class TockModel: ObservableObject {
     alarmPlayer?.stop()
     alarmPlayer = nil
     alarmRepeatCount = 0
+    alarmRepeatLimit = nil
+  }
+
+  private func currentTone() -> NotificationTone {
+    let raw = UserDefaults.standard.string(forKey: TockSettingsKeys.tone)
+    return NotificationTone(rawValue: raw ?? "") ?? .default
+  }
+
+  private func currentRepeatLimit() -> Int? {
+    let defaults = UserDefaults.standard
+    let storedValue = defaults.object(forKey: TockSettingsKeys.repeatCount) as? Int
+    let option = NotificationRepeatOption(rawValue: storedValue ?? NotificationRepeatOption.default.rawValue)
+      ?? .default
+    return option.repeatLimit
+  }
+
+  private func currentVolume() -> NotificationVolume {
+    let raw = UserDefaults.standard.string(forKey: TockSettingsKeys.volume)
+    return NotificationVolume(rawValue: raw ?? "") ?? .default
+  }
+
+  private func currentDefaultUnit() -> DefaultTimeUnit {
+    let raw = UserDefaults.standard.string(forKey: TockSettingsKeys.defaultUnit)
+    return DefaultTimeUnit(rawValue: raw ?? "") ?? .default
   }
 }

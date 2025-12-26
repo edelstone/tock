@@ -5,8 +5,9 @@ struct TockApp: App {
   @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
 
   var body: some Scene {
-    Settings {
+    WindowGroup {
       EmptyView()
     }
+    .handlesExternalEvents(matching: [])
   }
 }

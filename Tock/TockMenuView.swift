@@ -34,6 +34,17 @@ struct TockMenuView: View {
             }
           }
       }
+      .padding(.vertical, 6)
+      .padding(.horizontal, 8)
+      .background(
+        RoundedRectangle(cornerRadius: 6, style: .continuous)
+          .fill(
+            Color(
+              nsColor: NSColor.windowBackgroundColor.blended(withFraction: 0.04, of: .white)
+                ?? NSColor.windowBackgroundColor
+            )
+          )
+      )
       .font(.system(size: 26, weight: .regular))
       .frame(maxWidth: .infinity, alignment: .leading)
       .onAppear {
@@ -50,6 +61,16 @@ struct TockMenuView: View {
       }
 
       HStack(spacing: 6) {
+        Button {
+          SettingsWindowController.shared.show()
+          dismiss()
+        } label: {
+          Image(systemName: "gearshape.fill")
+            .font(.system(size: 20, weight: .semibold))
+            .frame(width: 28, height: 28)
+        }
+        .buttonStyle(.borderless)
+
         Spacer()
         Button {
           if model.isRunning {
