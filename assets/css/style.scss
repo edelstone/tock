@@ -6,3 +6,8 @@
 .container-lg > h1:first-of-type {
   display: none;
 }
+
+.container-lg > h1#tock,
+.markdown-body > h1#tock {
+  display: block;
+}
