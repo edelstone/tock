@@ -48,3 +48,7 @@ For developers:
 1. `Product > Archive`
 1. Organizer > `Distribute App` > `Custom` > `Copy App`
 1. Open the export folder and move the inner `Tock.app` to `/Applications`.
+
+## License
+
+MIT, use freely in commercial and personal projects.
