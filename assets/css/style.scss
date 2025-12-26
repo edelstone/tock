@@ -3,8 +3,7 @@
 
 @import "{{ site.theme }}";
 
-.container-lg > h1:first-of-type,
-.footer {
+.container-lg > h1:first-of-type {
   display: none;
 }
 
