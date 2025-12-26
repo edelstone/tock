@@ -136,7 +136,7 @@ final class TockModel: ObservableObject {
     case "":
       multiplier = currentDefaultUnit().multiplier
     default:
-      multiplier = currentDefaultUnit().multiplier
+      return 0
     }
 
     return max(0, value * multiplier)

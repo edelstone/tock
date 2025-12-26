@@ -8,28 +8,46 @@ enum TockSettingsKeys {
 }
 
 enum NotificationTone: String, CaseIterable, Identifiable {
-  case gentleRoll = "gentle-roll"
-  case correctAnswer = "correct-answer"
-  case electroMarimba = "electro-marimba"
-  case happyBells = "happy-bells"
-  case shireFlute = "shire-flute"
+  case alarmFrenzy = "alarm-frenzy"
+  case discreet
+  case fingerlicking
+  case gladToKnow = "glad-to-know"
+  case goodMorning = "good-morning"
+  case joyousChime = "joyous-chime"
+  case lightHearted = "light-hearted"
+  case openYourEyes = "open-your-eyes"
+  case rush
+  case wailing
+  case whistling
 
-  static let `default` = NotificationTone.gentleRoll
+  static let `default` = NotificationTone.lightHearted
 
   var id: String { rawValue }
 
   var displayName: String {
     switch self {
-    case .gentleRoll:
-      return "Gentle Roll"
-    case .correctAnswer:
-      return "Correct Answer"
-    case .electroMarimba:
-      return "Electro Marimba"
-    case .happyBells:
-      return "Happy Bells"
-    case .shireFlute:
-      return "Shire Flute"
+    case .alarmFrenzy:
+      return "Alarm Frenzy"
+    case .discreet:
+      return "Discreet"
+    case .fingerlicking:
+      return "Finger Licking"
+    case .gladToKnow:
+      return "Glad to Know"
+    case .goodMorning:
+      return "Good Morning"
+    case .joyousChime:
+      return "Joyous Chime"
+    case .lightHearted:
+      return "Light Hearted"
+    case .openYourEyes:
+      return "Open Your Eyes"
+    case .rush:
+      return "Rush"
+    case .wailing:
+      return "Wailing"
+    case .whistling:
+      return "Whistling"
     }
   }
 }

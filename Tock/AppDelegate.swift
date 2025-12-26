@@ -66,11 +66,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     guard let button = statusItem.button else { return }
     button.target = self
     button.action = #selector(statusItemClicked(_:))
-    button.sendAction(on: [.leftMouseUp, .rightMouseUp])
+    button.sendAction(on: [.leftMouseDown, .rightMouseUp])
   }
 
   private func bindModel() {
-    model.objectWillChange
+    Publishers.Merge3(
+      model.$remaining.map { _ in () },
+      model.$elapsed.map { _ in () },
+      model.$isRunning.map { _ in () }
+    )
       .sink { [weak self] _ in self?.updateStatusItem() }
       .store(in: &cancellables)
   }

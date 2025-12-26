@@ -1,15 +1,21 @@
 import AppKit
 import SwiftUI
 
-final class SettingsWindowController {
+final class SettingsWindowController: NSObject, NSWindowDelegate {
   static let shared = SettingsWindowController()
+  static let settingsWillCloseNotification = Notification.Name("TockSettingsWillClose")
+  static let settingsDidResignKeyNotification = Notification.Name("TockSettingsDidResignKey")
 
   private var window: NSWindow?
 
   func show() {
     let window = ensureWindow()
+    centerWindow(window)
     NSApp.activate(ignoringOtherApps: true)
     window.makeKeyAndOrderFront(nil)
+    DispatchQueue.main.async {
+      window.makeFirstResponder(nil)
+    }
   }
 
   private func ensureWindow() -> NSWindow {
@@ -33,9 +39,31 @@ final class SettingsWindowController {
       height: max(260, fittingSize.height)
     )
     window.setContentSize(contentSize)
-    window.center()
+    centerWindow(window)
     window.isReleasedWhenClosed = false
+    window.initialFirstResponder = nil
+    window.delegate = self
     self.window = window
     return window
   }
+
+  private func centerWindow(_ window: NSWindow) {
+    let screenFrame = NSScreen.main?.visibleFrame ?? window.screen?.visibleFrame
+    guard let screenFrame else { return }
+    let size = window.frame.size
+    let origin = NSPoint(
+      x: screenFrame.midX - (size.width / 2),
+      y: screenFrame.midY - (size.height / 2)
+    )
+    window.setFrameOrigin(origin)
+  }
+
+  func windowWillClose(_ notification: Notification) {
+    NotificationCenter.default.post(name: Self.settingsWillCloseNotification, object: nil)
+  }
+
+  func windowDidResignKey(_ notification: Notification) {
+    NotificationCenter.default.post(name: Self.settingsDidResignKeyNotification, object: nil)
+  }
+
 }

@@ -7,7 +7,7 @@ Super-minimal menubar timer with quick parsing, stopwatch mode, and configurable
 ## Features
 
 - Menubar timer with countdown + stopwatch, plus quick natural-language input.
-- Notification settings for tone (default: gentle-roll), repeat (default: 10x), volume (default: medium), and unit when omitted (default: minutes).
+- Notification settings for tone (default: light-hearted), repeat (default: 10x), volume (default: medium), and unit when omitted (default: minutes).
 - Context menu and popover controls for start/pause/clear and settings.
 
 ## Usage
@@ -31,23 +31,15 @@ To install:
 
 1. Drag `Tock.app` to `/Applications`.
 1. If macOS says the app is damaged, run this in Terminal: `xattr -dr com.apple.quarantine /Applications/Tock.app`
-1. Add the app to your login items via `System Settings > General > Login Items`.
+1. Optional: add the app to your login items via `System Settings > General > Login Items`.
 
-## Local development
+## Releasing
 
-For developers:
+See [docs/RELEASING.md](docs/RELEASING.md) for the full release and personal dev workflow.
 
-### Build and run
+## Credits
 
-1. Open `Tock.xcodeproj` in Xcode.
-1. Select the `Tock` scheme.
-1. Build and run.
-
-### Archive and export
-
-1. `Product > Archive`
-1. Organizer > `Distribute App` > `Custom` > `Copy App`
-1. Open the export folder and move the inner `Tock.app` to `/Applications`.
+All sounds from [Notification Sounds](https://notificationsounds.com).
 
 ## License
 
