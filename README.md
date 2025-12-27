@@ -19,8 +19,8 @@ Super-minimal menubar timer with quick parsing, stopwatch mode, and configurable
 
 ## Shortcuts
 
-- Open popover: `⌃⌥⌘T`
-- Clear timer: `⌃⌥⌘X`
+- Open popover: ⌃⌥⌘T
+- Clear timer: ⌃⌥⌘X
 
 ## Download
 
