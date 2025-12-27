@@ -27,6 +27,7 @@
 		AAAABBBB0000000000000030 /* Sounds/open-your-eyes.wav in Resources */ = {isa = PBXBuildFile; fileRef = 202020200000000000000020 /* Sounds/open-your-eyes.wav */; };
 		AAAABBBB0000000000000031 /* Sounds/rush.wav in Resources */ = {isa = PBXBuildFile; fileRef = 212121210000000000000021 /* Sounds/rush.wav */; };
 		AAAABBBB0000000000000032 /* Sounds/wailing.wav in Resources */ = {isa = PBXBuildFile; fileRef = 232323230000000000000023 /* Sounds/wailing.wav */; };
+		AAAABBBB0000000000000034 /* Sounds/wake-up.wav in Resources */ = {isa = PBXBuildFile; fileRef = 252525250000000000000025 /* Sounds/wake-up.wav */; };
 		AAAABBBB0000000000000033 /* Sounds/whistling.wav in Resources */ = {isa = PBXBuildFile; fileRef = 242424240000000000000024 /* Sounds/whistling.wav */; };
 		AAAABBBB0000000000000027 /* SettingsWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D1D1D1D000000000000001D /* SettingsWindowController.swift */; };
 /* End PBXBuildFile section */
@@ -47,6 +48,7 @@
 		202020200000000000000020 /* Sounds/open-your-eyes.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = "Sounds/open-your-eyes.wav"; sourceTree = "<group>"; };
 		212121210000000000000021 /* Sounds/rush.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = "Sounds/rush.wav"; sourceTree = "<group>"; };
 		232323230000000000000023 /* Sounds/wailing.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = "Sounds/wailing.wav"; sourceTree = "<group>"; };
+		252525250000000000000025 /* Sounds/wake-up.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = "Sounds/wake-up.wav"; sourceTree = "<group>"; };
 		242424240000000000000024 /* Sounds/whistling.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = "Sounds/whistling.wav"; sourceTree = "<group>"; };
 		1D1D1D1D000000000000001D /* SettingsWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsWindowController.swift; sourceTree = "<group>"; };
 		222222220000000000000008 /* TockApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TockApp.swift; sourceTree = "<group>"; };
@@ -99,6 +101,7 @@
 				202020200000000000000020 /* Sounds/open-your-eyes.wav */,
 				212121210000000000000021 /* Sounds/rush.wav */,
 				232323230000000000000023 /* Sounds/wailing.wav */,
+				252525250000000000000025 /* Sounds/wake-up.wav */,
 				242424240000000000000024 /* Sounds/whistling.wav */,
 				55555555000000000000000B /* Assets.xcassets */,
 				66666666000000000000000C /* Preview Content */,
@@ -189,6 +192,7 @@
 				AAAABBBB0000000000000030 /* Sounds/open-your-eyes.wav in Resources */,
 				AAAABBBB0000000000000031 /* Sounds/rush.wav in Resources */,
 				AAAABBBB0000000000000032 /* Sounds/wailing.wav in Resources */,
+				AAAABBBB0000000000000034 /* Sounds/wake-up.wav in Resources */,
 				AAAABBBB0000000000000033 /* Sounds/whistling.wav in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

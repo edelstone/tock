@@ -18,6 +18,7 @@ enum NotificationTone: String, CaseIterable, Identifiable {
   case openYourEyes = "open-your-eyes"
   case rush
   case wailing
+  case wakeUp = "wake-up"
   case whistling
 
   static let `default` = NotificationTone.lightHearted
@@ -46,6 +47,8 @@ enum NotificationTone: String, CaseIterable, Identifiable {
       return "Rush"
     case .wailing:
       return "Wailing"
+    case .wakeUp:
+      return "Wake Up"
     case .whistling:
       return "Whistling"
     }
