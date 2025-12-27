@@ -13,7 +13,7 @@ Super-minimal menubar timer with quick parsing, stopwatch mode, and configurable
 ## Usage
 
 - Enter a duration like `10`, `5m`, `1.5h`, `45 sec`, or `17m 45s`, then press Enter.
-- Enter a time like `10pm` or `6:15am` to count down until the next occurrence.
+- Enter a time like `10pm` or `6:15a` to count down until the next occurrence.
 - Click the play button to start a stopwatch without a countdown.
 - Clear stops the timer and silences the alarm.
 
