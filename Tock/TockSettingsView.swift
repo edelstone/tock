@@ -8,6 +8,7 @@ struct TockSettingsView: View {
   @AppStorage(TockSettingsKeys.volume) private var selectedVolume = NotificationVolume.default.rawValue
   @AppStorage(TockSettingsKeys.defaultUnit) private var defaultUnit = DefaultTimeUnit.default.rawValue
   @State private var previewPlayer: AVAudioPlayer?
+  @State private var previewPlayers: [String: AVAudioPlayer] = [:]
   @State private var skipTonePreview = false
 
   private enum FocusField {
@@ -89,6 +90,7 @@ struct TockSettingsView: View {
           DispatchQueue.main.async {
             focusedField = .tone
           }
+          preloadPreviewTones()
           if NotificationTone(rawValue: selectedTone) == nil {
             skipTonePreview = true
             selectedTone = NotificationTone.default.rawValue
@@ -112,21 +114,46 @@ struct TockSettingsView: View {
 
   private func playPreviewTone(named rawValue: String) {
     stopPreviewTone()
-    guard let url = Bundle.main.url(forResource: rawValue, withExtension: "wav") else { return }
-    do {
-      previewPlayer = try AVAudioPlayer(contentsOf: url)
-      let volume = NotificationVolume(rawValue: selectedVolume) ?? .default
-      previewPlayer?.volume = volume.level
-      previewPlayer?.play()
-    } catch {
-      previewPlayer = nil
+    if let cached = previewPlayers[rawValue] {
+      previewPlayer = cached
+    } else if let url = Bundle.main.url(forResource: rawValue, withExtension: "wav"),
+              let player = try? AVAudioPlayer(contentsOf: url) {
+      previewPlayers[rawValue] = player
+      previewPlayer = player
     }
+
+    let volume = NotificationVolume(rawValue: selectedVolume) ?? .default
+    previewPlayer?.volume = volume.level
+    previewPlayer?.currentTime = 0
+    previewPlayer?.play()
   }
 
   private func stopPreviewTone() {
     previewPlayer?.stop()
     previewPlayer?.currentTime = 0
     previewPlayer = nil
+  }
+
+  private func preloadPreviewTones() {
+    guard previewPlayers.isEmpty else { return }
+    let tones = NotificationTone.allCases.map { $0.rawValue }
+    DispatchQueue.global(qos: .userInitiated).async {
+      var players: [String: AVAudioPlayer] = [:]
+      for tone in tones {
+        guard let url = Bundle.main.url(forResource: tone, withExtension: "wav") else { continue }
+        if let player = try? AVAudioPlayer(contentsOf: url) {
+          player.prepareToPlay()
+          players[tone] = player
+        }
+      }
+      DispatchQueue.main.async {
+        if self.previewPlayers.isEmpty {
+          self.previewPlayers = players
+        } else {
+          self.previewPlayers.merge(players) { existing, _ in existing }
+        }
+      }
+    }
   }
 
 }

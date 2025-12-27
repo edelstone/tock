@@ -117,6 +117,18 @@ final class TockModel: ObservableObject {
     let trimmed = inputDuration.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
     guard !trimmed.isEmpty else { return 0 }
 
+    if let interval = parsedTimeOfDayInterval(from: trimmed) {
+      return interval
+    }
+
+    if let interval = parsedColonDuration(from: trimmed) {
+      return interval
+    }
+
+    if let composite = parsedCompositeDuration(from: trimmed) {
+      return composite
+    }
+
     let numberChars = "0123456789."
     let numberPart = trimmed.prefix { numberChars.contains($0) }
     let unitPart = trimmed.dropFirst(numberPart.count)
@@ -126,20 +138,148 @@ final class TockModel: ObservableObject {
     guard value > 0 else { return 0 }
 
     let multiplier: Double
-    switch unitPart {
-    case "m", "min", "mins", "minute", "minutes":
-      multiplier = 60
-    case "s", "sec", "secs", "second", "seconds":
-      multiplier = 1
-    case "h", "hr", "hrs", "hour", "hours":
-      multiplier = 3600
-    case "":
+    if unitPart.isEmpty {
       multiplier = currentDefaultUnit().multiplier
-    default:
-      return 0
+    } else {
+      guard let parsedUnit = unitForToken(unitPart) else { return 0 }
+      multiplier = parsedUnit.multiplier
     }
 
     return max(0, value * multiplier)
+  }
+
+  private func parsedCompositeDuration(from input: String) -> TimeInterval? {
+    let cleaned = input.replacingOccurrences(of: ",", with: "")
+    let scanner = Scanner(string: cleaned)
+    scanner.charactersToBeSkipped = .whitespacesAndNewlines
+
+    var total: Double = 0
+    var lastUnit: ParsedUnit?
+
+    while !scanner.isAtEnd {
+      guard let value = scanner.scanDouble(), value > 0 else { return nil }
+
+      let unit = scanner.scanCharacters(from: .letters)?.lowercased()
+      if let unit, !unit.isEmpty {
+        guard let parsedUnit = unitForToken(unit) else { return nil }
+        total += value * parsedUnit.multiplier
+        lastUnit = parsedUnit
+      } else {
+        guard let currentUnit = lastUnit,
+              let nextUnit = nextSmallerUnit(after: currentUnit) else {
+          return nil
+        }
+        total += value * nextUnit.multiplier
+        lastUnit = nextUnit
+      }
+    }
+
+    return total > 0 ? total : nil
+  }
+
+  private func parsedColonDuration(from input: String) -> TimeInterval? {
+    guard input.contains(":") else { return nil }
+    let compact = input.replacingOccurrences(of: " ", with: "")
+    guard !compact.contains("am"), !compact.contains("pm") else { return nil }
+
+    let parts = compact.split(separator: ":")
+    guard parts.count == 2 || parts.count == 3 else { return nil }
+    guard let first = Int(parts[0]), let second = Int(parts[1]) else { return nil }
+    guard first >= 0, second >= 0 else { return nil }
+
+    if parts.count == 2 {
+      guard second < 60 else { return nil }
+      return Double(first * 60 + second)
+    }
+
+    guard let third = Int(parts[2]), third >= 0 else { return nil }
+    guard second < 60, third < 60 else { return nil }
+    return Double(first * 3600 + second * 60 + third)
+  }
+
+  private enum ParsedUnit {
+    case hour
+    case minute
+    case second
+
+    var multiplier: Double {
+      switch self {
+      case .hour:
+        return 3600
+      case .minute:
+        return 60
+      case .second:
+        return 1
+      }
+    }
+  }
+
+  private func unitForToken(_ unit: String) -> ParsedUnit? {
+    switch unit {
+    case "m", "min", "mins", "minute", "minutes":
+      return .minute
+    case "s", "sec", "secs", "second", "seconds":
+      return .second
+    case "h", "hr", "hrs", "hour", "hours":
+      return .hour
+    default:
+      return nil
+    }
+  }
+
+  private func nextSmallerUnit(after unit: ParsedUnit) -> ParsedUnit? {
+    switch unit {
+    case .hour:
+      return .minute
+    case .minute:
+      return .second
+    case .second:
+      return nil
+    }
+  }
+
+  private func parsedTimeOfDayInterval(from input: String) -> TimeInterval? {
+    let compact = input.replacingOccurrences(of: " ", with: "")
+    if compact == "noon" {
+      return intervalUntil(hour: 12, minute: 0)
+    }
+    if compact == "midnight" {
+      return intervalUntil(hour: 0, minute: 0)
+    }
+    guard compact.contains("am") || compact.contains("pm") else {
+      return nil
+    }
+
+    let formats = ["h:mma", "ha", "H:mm", "HH:mm"]
+    let formatter = DateFormatter()
+    formatter.locale = Locale(identifier: "en_US_POSIX")
+    formatter.timeZone = TimeZone.current
+
+    for format in formats {
+      formatter.dateFormat = format
+      guard let parsed = formatter.date(from: compact) else { continue }
+      let components = Calendar.current.dateComponents([.hour, .minute], from: parsed)
+      guard let hour = components.hour, let minute = components.minute else { continue }
+      if let interval = intervalUntil(hour: hour, minute: minute) {
+        return interval
+      }
+    }
+
+    return nil
+  }
+
+  private func intervalUntil(hour: Int, minute: Int) -> TimeInterval? {
+    let calendar = Calendar.current
+    let now = Date()
+    guard var target = calendar.date(bySettingHour: hour, minute: minute, second: 0, of: now) else {
+      return nil
+    }
+    if target <= now {
+      guard let next = calendar.date(byAdding: .day, value: 1, to: target) else { return nil }
+      target = next
+    }
+    let interval = target.timeIntervalSince(now)
+    return interval > 0 ? interval : nil
   }
 
   private func scheduleTimer() {

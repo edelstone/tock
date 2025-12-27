@@ -11,7 +11,8 @@ struct TockMenuView: View {
     "1 min", "5 mins", "12 minutes",
     "20m", "25 min", "45 minutes",
     "1h", "1 hr", "1.5 hrs", "2 hours",
-    "3h", "4 hours"
+    "3h", "4 hours", "17m 45s", "1h 30m",
+    "25:00", "10pm", "6:15am", "noon"
   ]
 
   private static func randomSuggestion() -> String {
