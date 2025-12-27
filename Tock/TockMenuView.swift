@@ -5,7 +5,6 @@ struct TockMenuView: View {
   @Environment(\.menuDismiss) private var dismiss
   @State private var placeholder = Self.randomSuggestion()
   @FocusState private var isInputFocused: Bool
-  private static let textFieldBackground = Color(nsColor: .controlBackgroundColor)
 
   private static let suggestions = [
     "10s", "30 sec", "45 secs",
@@ -13,7 +12,7 @@ struct TockMenuView: View {
     "20m", "25 min", "45 minutes",
     "1h", "1 hr", "1.5 hrs", "2 hours",
     "3h", "4 hours", "17m 45s", "1h 30m",
-    "25:00", "10pm", "6:15a", "noon"
+    "25:00", "10pm", "6:15a", "noon",
   ]
 
   private static func randomSuggestion() -> String {
@@ -40,8 +39,9 @@ struct TockMenuView: View {
       .padding(.horizontal, 8)
       .background(
         RoundedRectangle(cornerRadius: 6, style: .continuous)
-          .fill(Self.textFieldBackground)
+          .fill(.regularMaterial)
       )
+
       .font(.system(size: 26, weight: .regular))
       .frame(maxWidth: .infinity, alignment: .leading)
       .onAppear {
@@ -50,7 +50,9 @@ struct TockMenuView: View {
           isInputFocused = true
         }
       }
-      .onReceive(NotificationCenter.default.publisher(for: Notification.Name("TockPopoverWillShow"))) { _ in
+      .onReceive(
+        NotificationCenter.default.publisher(for: Notification.Name("TockPopoverWillShow"))
+      ) { _ in
         placeholder = Self.randomSuggestion()
         DispatchQueue.main.async {
           isInputFocused = true
