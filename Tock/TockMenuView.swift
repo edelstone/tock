@@ -106,10 +106,6 @@ struct TockMenuView: View {
       }
     }
     .padding(16)
-    .background(
-      RoundedRectangle(cornerRadius: 4, style: .continuous)
-        .fill(Color(nsColor: .windowBackgroundColor))
-    )
     .frame(width: 210)
   }
 }

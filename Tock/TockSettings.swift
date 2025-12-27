@@ -21,7 +21,7 @@ enum NotificationTone: String, CaseIterable, Identifiable {
   case wakeUp = "wake-up"
   case whistling
 
-  static let `default` = NotificationTone.lightHearted
+  static let `default` = NotificationTone.wakeUp
 
   var id: String { rawValue }
 
@@ -93,6 +93,7 @@ enum NotificationRepeatOption: Int, CaseIterable, Identifiable {
 }
 
 enum NotificationVolume: String, CaseIterable, Identifiable {
+  case ultraLow = "ultra-low"
   case low
   case medium
   case high
@@ -103,6 +104,8 @@ enum NotificationVolume: String, CaseIterable, Identifiable {
 
   var displayName: String {
     switch self {
+    case .ultraLow:
+      return "Ultra Low"
     case .low:
       return "Low"
     case .medium:
@@ -114,6 +117,8 @@ enum NotificationVolume: String, CaseIterable, Identifiable {
 
   var level: Float {
     switch self {
+    case .ultraLow:
+      return 0.2
     case .low:
       return 0.35
     case .medium:
