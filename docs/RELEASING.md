@@ -20,10 +20,10 @@ Before tagging, make sure all release changes are committed and pushed, then:
 
 1. Development: open `Tock.xcodeproj`, select the `Tock` scheme, and run from Xcode.
 2. Pre-release: rebuild the unsigned DMG locally, then install and test that build.
+   - `cd /path/to/tock`
    - Build DMG:
 
      ```bash
-     cd /Users/Michael/Sites/tock
      xcodebuild -scheme Tock -configuration Release -derivedDataPath build CODE_SIGNING_ALLOWED=NO
      ./scripts/make-dmg.sh "build/Build/Products/Release/Tock.app" "dist/Tock.dmg"
      ```
