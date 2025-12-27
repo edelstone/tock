@@ -26,7 +26,7 @@ Super-minimal menubar timer with quick parsing, stopwatch mode, and configurable
 
 Download the latest macOS build:
 
-[![Download](https://img.shields.io/github/v/release/edelstone/tock?label=Download&color=1b5e20)](https://github.com/edelstone/tock/releases/latest/download/Tock.dmg)
+[![Download](https://img.shields.io/github/v/release/edelstone/tock?label=Download&logo=apple&style=for-the-badge&color=5865f2)](https://github.com/edelstone/tock/releases/latest/download/Tock.dmg)
 
 To install:
 
