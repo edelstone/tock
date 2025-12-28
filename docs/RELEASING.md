@@ -6,7 +6,7 @@ This repo uses GitHub Actions to build and publish an unsigned DMG on tag pushes
 
 - Xcode installed (for local builds).
 - The `Tock` scheme is shared in Xcode (Manage Schemes → Shared). One-time setup.
-- GitHub CLI (`gh`) installed only if you want to edit release notes from the terminal (optional).
+- Optional: GitHub CLI (`gh`) installed, if you want to edit release notes from the terminal.
 
 ## Development
 
@@ -39,7 +39,7 @@ Build and test the app locally before tagging a release (optional but recommende
 4. Optional: edit the GitHub release notes later with `gh release edit` if needed, for example:  
    `gh release edit v0.1.0 --notes $'Highlights:\n- First item\n- Second item'`
 5. Download and install the GitHub Release DMG and verify it launches successfully (this is the exact CI artifact users get).
-   - If macOS blocks launch (Gatekeeper), remove quarantine for Tock only:
+   - If macOS blocks launch (Gatekeeper), remove quarantine for Tock only:  
      `xattr -dr com.apple.quarantine /Applications/Tock.app`
 
 ## Daily use
