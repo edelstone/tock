@@ -1,33 +1,47 @@
 # Releasing
 
-This repo includes a GitHub Actions workflow that builds an unsigned DMG on tag pushes and uploads it to a GitHub Release. (Unsigned means macOS may warn on first launch.)
+This repo uses GitHub Actions to build and publish an unsigned DMG on tag pushes.
 
-Prereqs:
+## Prereqs
 
 - Xcode installed (for local builds).
-- The `Tock` scheme is shared in Xcode (Manage Schemes → Shared). This is a one-time setup; skip if it is already shared.
-- GitHub CLI (`gh`) installed if you want to publish release notes from the terminal.
+- The `Tock` scheme is shared in Xcode (Manage Schemes → Shared). One-time setup.
+- GitHub CLI (`gh`) installed only if you want to edit release notes from the terminal (optional).
 
-Before tagging, make sure all release changes are committed and pushed, then:
+## Development
 
-1. Tag a release: `git tag v0.1.0`
-1. Push the tag: `git push origin v0.1.0`
-1. Optional: edit GitHub Release notes with the CLI (supports bullet lists):
-   - `gh release edit v0.1.0 --notes $'Highlights:\n- First item\n- Second item'`
-1. Optional: download the GitHub Release DMG and smoke test it (CI artifact that users get).
+Open `Tock.xcodeproj`, select the `Tock` scheme, and run from Xcode.
 
-## Personal dev workflow
+## Pre-release (local)
 
-1. Development: open `Tock.xcodeproj`, select the `Tock` scheme, and run from Xcode.
-2. Pre-release: rebuild the unsigned DMG locally, then install and test that build.
-   - `cd /path/to/tock`
-   - Build DMG:
+Build and test the app before tagging a release (optional but recommended to catch obvious issues before CI).
+
+1. Build the unsigned DMG.
 
      ```bash
-     xcodebuild -scheme Tock -configuration Release -derivedDataPath build CODE_SIGNING_ALLOWED=NO
+     cd /path/to/tock
+     rm -rf build dist
+     mkdir -p dist
+     xcodebuild -scheme Tock -configuration Release -destination 'generic/platform=macOS' -derivedDataPath build CODE_SIGNING_ALLOWED=NO
      ./scripts/make-dmg.sh "build/Build/Products/Release/Tock.app" "dist/Tock.dmg"
      ```
 
-   - Install from: `dist/Tock.dmg` (drag to `/Applications`).
-3. Release: once the DMG build passes, follow the release steps above (commit/push, tag, push tag).
-4. Daily use: run the installed app from `/Applications`; update it by reinstalling the latest `dist/Tock.dmg` when needed.
+2. Install the DMG: open `dist/Tock.dmg` and drag `Tock.app` to `/Applications`.
+3. Test the DMG: launch the app and verify core behavior, notifications, and shortcuts.
+
+## Publish a release (CI)
+
+1. Commit and push all new release changes to GitHub.
+2. Create an annotated release tag and add release notes (multi-line messages are supported):  
+   `git tag -a v0.1.0 -m "release notes go here"`
+3. Push the tag:  
+   `git push origin v0.1.0`
+4. Optional: edit the GitHub release notes later with `gh release edit` if needed, for example:  
+   `gh release edit v0.1.0 --notes $'Highlights:\n- First item\n- Second item'`
+5. Download and install the GitHub Release DMG and verify it launches successfully (this is the exact CI artifact users get).
+   - If macOS blocks launch (Gatekeeper), remove quarantine for Tock only:
+     `xattr -dr com.apple.quarantine /Applications/Tock.app`
+
+## Daily use
+
+Use the GitHub Release installed in `/Applications`. To update, download and reinstall the latest DMG from the GitHub Releases page.

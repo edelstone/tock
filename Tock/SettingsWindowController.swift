@@ -11,8 +11,13 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
   func show() {
     let window = ensureWindow()
     centerWindow(window)
+    if window.isMiniaturized {
+      window.deminiaturize(nil)
+    }
+    NSApp.unhide(nil)
     NSApp.activate(ignoringOtherApps: true)
     window.makeKeyAndOrderFront(nil)
+    window.orderFrontRegardless()
     DispatchQueue.main.async {
       window.makeFirstResponder(nil)
     }

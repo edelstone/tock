@@ -12,8 +12,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
   private var hotKeyRef: EventHotKeyRef?
   private var trashHotKeyRef: EventHotKeyRef?
   private var hotKeyHandlerRef: EventHandlerRef?
-  private let hotKeyId: UInt32 = 1
-  private let trashHotKeyId: UInt32 = 2
+  private var currentOpenHotkey: Hotkey?
+  private var currentClearHotkey: Hotkey?
+  private var hotkeyDefaultsObserver: NSObjectProtocol?
+  private var hotkeyChangeObserver: NSObjectProtocol?
   private var contextMenu: NSMenu?
   private var stopwatchItem: NSMenuItem?
   private var pauseItem: NSMenuItem?
@@ -42,7 +44,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
     configureStatusItem()
     bindModel()
     updateStatusItem()
-    registerHotKey()
+    configureHotkeys()
   }
 
   private func terminateOtherInstances() {
@@ -104,14 +106,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
 
   @objc private func statusItemClicked(_ sender: NSStatusBarButton) {
     guard let event = NSApp.currentEvent else {
-      NSApp.activate(ignoringOtherApps: true)
       togglePopover(sender)
       return
     }
     if event.type == .rightMouseUp {
       showContextMenu()
     } else {
-      NSApp.activate(ignoringOtherApps: true)
       togglePopover(sender)
     }
   }
@@ -237,32 +237,160 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
     SettingsWindowController.shared.show()
   }
 
-  private func registerHotKey() {
-    let modifiers: UInt32 = UInt32(controlKey | optionKey | cmdKey)
-    let signature = OSType(bitPattern: 0x544F434B)
-    let hotKeyID = EventHotKeyID(signature: signature, id: hotKeyId)
-    RegisterEventHotKey(UInt32(kVK_ANSI_T), modifiers, hotKeyID, GetEventDispatcherTarget(), 0, &hotKeyRef)
-    let trashHotKeyID = EventHotKeyID(signature: signature, id: trashHotKeyId)
-    RegisterEventHotKey(UInt32(kVK_ANSI_X), modifiers, trashHotKeyID, GetEventDispatcherTarget(), 0, &trashHotKeyRef)
+  private func configureHotkeys() {
+    #if canImport(KeyboardShortcuts)
+    Hotkey.migrateRecorderDefaultsIfNeeded()
+    #endif
+    Hotkey.seedDefaultsIfNeeded()
+    reloadHotkeysFromDefaults()
+    observeHotkeyDefaults()
+    observeHotkeyChanges()
+  }
 
-    if hotKeyHandlerRef == nil {
-      var eventType = EventTypeSpec(eventClass: OSType(kEventClassKeyboard), eventKind: UInt32(kEventHotKeyPressed))
-      InstallEventHandler(GetEventDispatcherTarget(), { _, event, userData in
-        guard let event, let userData else { return noErr }
-        var hkID = EventHotKeyID()
-        let status = GetEventParameter(event, EventParamName(kEventParamDirectObject), EventParamType(typeEventHotKeyID), nil, MemoryLayout<EventHotKeyID>.size, nil, &hkID)
-        guard status == noErr else { return status }
-        let appDelegate = Unmanaged<AppDelegate>.fromOpaque(userData).takeUnretainedValue()
-        DispatchQueue.main.async {
-          if hkID.id == appDelegate.hotKeyId {
-            appDelegate.togglePopoverFromHotKey()
-          } else if hkID.id == appDelegate.trashHotKeyId {
-            appDelegate.trashFromHotKey()
-          }
-        }
-        return noErr
-      }, 1, &eventType, UnsafeMutableRawPointer(Unmanaged.passUnretained(self).toOpaque()), &hotKeyHandlerRef)
+  private func observeHotkeyDefaults() {
+    guard hotkeyDefaultsObserver == nil else { return }
+    hotkeyDefaultsObserver = NotificationCenter.default.addObserver(
+      forName: UserDefaults.didChangeNotification,
+      object: UserDefaults.standard,
+      queue: .main
+    ) { [weak self] _ in
+      Task { @MainActor in
+        self?.reloadHotkeysFromDefaults()
+      }
     }
+  }
+
+  private func observeHotkeyChanges() {
+    guard hotkeyChangeObserver == nil else { return }
+    hotkeyChangeObserver = NotificationCenter.default.addObserver(
+      forName: Hotkey.didChangeNotification,
+      object: nil,
+      queue: .main
+    ) { [weak self] _ in
+      Task { @MainActor in
+        self?.reloadHotkeysFromDefaults()
+      }
+    }
+  }
+
+  private func reloadHotkeysFromDefaults() {
+    updateHotkey(.open, newHotkey: Hotkey.load(for: .open))
+    updateHotkey(.clear, newHotkey: Hotkey.load(for: .clear))
+  }
+
+  private func updateHotkey(_ action: HotkeyAction, newHotkey: Hotkey?) {
+    let currentHotkey = hotkey(for: action)
+    guard currentHotkey != newHotkey else { return }
+    unregisterHotkey(action)
+    guard let newHotkey else {
+      setHotkey(nil, for: action)
+      return
+    }
+    if registerHotkey(newHotkey, for: action) {
+      setHotkey(newHotkey, for: action)
+    } else if let currentHotkey, registerHotkey(currentHotkey, for: action) {
+      setHotkey(currentHotkey, for: action)
+    }
+  }
+
+  private func hotkey(for action: HotkeyAction) -> Hotkey? {
+    switch action {
+    case .open:
+      return currentOpenHotkey
+    case .clear:
+      return currentClearHotkey
+    }
+  }
+
+  private func setHotkey(_ hotkey: Hotkey?, for action: HotkeyAction) {
+    switch action {
+    case .open:
+      currentOpenHotkey = hotkey
+    case .clear:
+      currentClearHotkey = hotkey
+    }
+  }
+
+  private func registerHotkey(_ hotkey: Hotkey, for action: HotkeyAction) -> Bool {
+    let signature = OSType(bitPattern: 0x544F434B)
+    let hotKeyID = EventHotKeyID(signature: signature, id: action.id)
+    var registeredHotKey: EventHotKeyRef?
+    let modifiers = Hotkey.carbonFlags(from: hotkey.modifierFlags)
+    let status = RegisterEventHotKey(
+      UInt32(hotkey.keyCode),
+      modifiers,
+      hotKeyID,
+      GetEventDispatcherTarget(),
+      0,
+      &registeredHotKey
+    )
+    guard status == noErr else {
+      print("Hotkey registration failed for \(action) status=\(status) keyCode=\(hotkey.keyCode) modifiers=\(modifiers)")
+      NotificationCenter.default.post(
+        name: Hotkey.registrationFailedNotification,
+        object: nil,
+        userInfo: [
+          Hotkey.registrationFailedActionKey: action,
+          Hotkey.registrationFailedStatusKey: Int(status)
+        ]
+      )
+      return false
+    }
+
+    switch action {
+    case .open:
+      hotKeyRef = registeredHotKey
+    case .clear:
+      trashHotKeyRef = registeredHotKey
+    }
+
+    installHotkeyHandlerIfNeeded()
+    return true
+  }
+
+  private func unregisterHotkey(_ action: HotkeyAction) {
+    let hotkeyRef: EventHotKeyRef?
+    switch action {
+    case .open:
+      hotkeyRef = hotKeyRef
+      self.hotKeyRef = nil
+    case .clear:
+      hotkeyRef = trashHotKeyRef
+      trashHotKeyRef = nil
+    }
+    if let hotkeyRef {
+      UnregisterEventHotKey(hotkeyRef)
+    }
+  }
+
+  private func installHotkeyHandlerIfNeeded() {
+    guard hotKeyHandlerRef == nil else { return }
+    var eventType = EventTypeSpec(eventClass: OSType(kEventClassKeyboard), eventKind: UInt32(kEventHotKeyPressed))
+    InstallEventHandler(GetEventDispatcherTarget(), { _, event, userData in
+      guard let event, let userData else { return noErr }
+      var hkID = EventHotKeyID()
+      let status = GetEventParameter(
+        event,
+        EventParamName(kEventParamDirectObject),
+        EventParamType(typeEventHotKeyID),
+        nil,
+        MemoryLayout<EventHotKeyID>.size,
+        nil,
+        &hkID
+      )
+      guard status == noErr else { return status }
+      let appDelegate = Unmanaged<AppDelegate>.fromOpaque(userData).takeUnretainedValue()
+      DispatchQueue.main.async {
+        guard let action = HotkeyAction(id: hkID.id) else { return }
+        switch action {
+        case .open:
+          appDelegate.togglePopoverFromHotKey()
+        case .clear:
+          appDelegate.trashFromHotKey()
+        }
+      }
+      return noErr
+    }, 1, &eventType, UnsafeMutableRawPointer(Unmanaged.passUnretained(self).toOpaque()), &hotKeyHandlerRef)
   }
 
   private func startEventMonitors() {

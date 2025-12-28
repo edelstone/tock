@@ -1,5 +1,9 @@
 import SwiftUI
 import AVFoundation
+#if canImport(KeyboardShortcuts)
+import AppKit
+import KeyboardShortcuts
+#endif
 
 struct TockSettingsView: View {
   @FocusState private var focusedField: FocusField?
@@ -10,6 +14,11 @@ struct TockSettingsView: View {
   @State private var previewPlayer: AVAudioPlayer?
   @State private var previewPlayers: [String: AVAudioPlayer] = [:]
   @State private var skipTonePreview = false
+  @State private var openHotkey: Hotkey?
+  @State private var clearHotkey: Hotkey?
+  @State private var hasHotkeyConflict = false
+  @State private var isUpdatingRecorder = false
+  @State private var hotkeyErrorMessage: String?
 
   private enum FocusField {
     case tone
@@ -85,18 +94,85 @@ struct TockSettingsView: View {
           .focused($focusedField, equals: .defaultUnit)
           .focusEffectDisabled()
           .pickerStyle(.menu)
+
+          LabeledContent {
+            #if canImport(KeyboardShortcuts)
+            KeyboardShortcutsRecorderRepresentable(
+              name: .openRecorder,
+              onChange: { shortcut in
+                handleRecorderChange(action: .open, shortcut: shortcut)
+              }
+            )
+            .frame(width: 110)
+            .padding(.leading, 12)
+            .alignmentGuide(.firstTextBaseline) { dimensions in
+              dimensions[VerticalAlignment.center]
+            }
+            #else
+            Text("Add KeyboardShortcuts")
+              .foregroundStyle(.secondary)
+            #endif
+          } label: {
+            Text("Open Tock")
+              .alignmentGuide(.firstTextBaseline) { dimensions in
+                dimensions[VerticalAlignment.center]
+              }
+          }
+
+          LabeledContent {
+            #if canImport(KeyboardShortcuts)
+            KeyboardShortcutsRecorderRepresentable(
+              name: .clearRecorder,
+              onChange: { shortcut in
+                handleRecorderChange(action: .clear, shortcut: shortcut)
+              }
+            )
+            .frame(width: 110)
+            .padding(.leading, 12)
+            .alignmentGuide(.firstTextBaseline) { dimensions in
+              dimensions[VerticalAlignment.center]
+            }
+            #else
+            Text("Add KeyboardShortcuts")
+              .foregroundStyle(.secondary)
+            #endif
+          } label: {
+            Text("Clear timer")
+              .alignmentGuide(.firstTextBaseline) { dimensions in
+                dimensions[VerticalAlignment.center]
+              }
+          }
+
+          if hasHotkeyConflict {
+            Text("Open and Clear shortcuts must be different.")
+              .foregroundStyle(.red)
+          }
+          if let hotkeyErrorMessage {
+            Text(hotkeyErrorMessage)
+              .foregroundStyle(.red)
+              .frame(maxWidth: .infinity, alignment: .leading)
+              .fixedSize(horizontal: false, vertical: true)
+          }
         }
         .onAppear {
           DispatchQueue.main.async {
             focusedField = .tone
           }
+          #if canImport(KeyboardShortcuts)
+          Hotkey.migrateRecorderDefaultsIfNeeded()
+          #endif
+          Hotkey.seedDefaultsIfNeeded()
+          loadHotkeysFromDefaults()
           preloadPreviewTones()
           if NotificationTone(rawValue: selectedTone) == nil {
             skipTonePreview = true
             selectedTone = NotificationTone.default.rawValue
           }
         }
-        .frame(maxWidth: 280)
+        .onReceive(NotificationCenter.default.publisher(for: Hotkey.registrationFailedNotification)) { notification in
+          hotkeyErrorMessage = Self.formatHotkeyError(notification)
+        }
+        .frame(width: 300)
       }
     }
     .padding(20)
@@ -154,6 +230,72 @@ struct TockSettingsView: View {
         }
       }
     }
+  }
+
+  private func loadHotkeysFromDefaults() {
+    openHotkey = Hotkey.load(for: .open)
+    clearHotkey = Hotkey.load(for: .clear)
+    updateHotkeyConflict()
+    syncRecorderFromDefaults()
+  }
+
+  private func updateHotkeyConflict() {
+    hasHotkeyConflict = openHotkey != nil && openHotkey == clearHotkey
+    if hasHotkeyConflict {
+      hotkeyErrorMessage = nil
+    }
+  }
+
+  private func syncRecorderFromDefaults() {
+    #if canImport(KeyboardShortcuts)
+    isUpdatingRecorder = true
+    Hotkey.updateRecorderUI(openHotkey, name: .openRecorder)
+    Hotkey.updateRecorderUI(clearHotkey, name: .clearRecorder)
+    isUpdatingRecorder = false
+    #endif
+  }
+
+  #if canImport(KeyboardShortcuts)
+  private func handleRecorderChange(action: HotkeyAction, shortcut: KeyboardShortcuts.Shortcut?) {
+    guard !isUpdatingRecorder else { return }
+    let proposed = Hotkey(keyboardShortcut: shortcut)
+    let recorderName: KeyboardShortcuts.Name = action == .open ? .openRecorder : .clearRecorder
+    Hotkey.updateRecorderUI(proposed, name: recorderName)
+    if let proposed, !Hotkey.isValid(modifierFlags: proposed.modifierFlags) {
+      syncRecorderFromDefaults()
+      return
+    }
+
+    var nextOpen = openHotkey
+    var nextClear = clearHotkey
+    switch action {
+    case .open:
+      nextOpen = proposed
+    case .clear:
+      nextClear = proposed
+    }
+
+    hasHotkeyConflict = nextOpen != nil && nextOpen == nextClear
+    guard !hasHotkeyConflict else { return }
+    openHotkey = nextOpen
+    clearHotkey = nextClear
+    Hotkey.save(openHotkey, for: .open)
+    Hotkey.save(clearHotkey, for: .clear)
+    hotkeyErrorMessage = nil
+  }
+  #endif
+
+  private static func formatHotkeyError(_ notification: Notification) -> String {
+    guard
+      let userInfo = notification.userInfo,
+      let action = userInfo[Hotkey.registrationFailedActionKey] as? HotkeyAction,
+      let status = userInfo[Hotkey.registrationFailedStatusKey] as? Int
+    else {
+      return "Hotkey registration failed."
+    }
+
+    let actionName = action == .open ? "Open Tock" : "Clear timer"
+    return "\(actionName) shortcut failed to register (status \(status))."
   }
 
 }

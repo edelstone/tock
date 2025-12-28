@@ -5,6 +5,8 @@ enum TockSettingsKeys {
   static let repeatCount = "notificationRepeatCount"
   static let volume = "notificationVolume"
   static let defaultUnit = "defaultTimeUnit"
+  static let openHotkey = "hotkeyOpen"
+  static let clearHotkey = "hotkeyClear"
 }
 
 enum NotificationTone: String, CaseIterable, Identifiable {

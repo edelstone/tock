@@ -17,6 +17,10 @@
 		AAAABBBB0000000000000019 /* AppIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 151515150000000000000015 /* AppIcon.icns */; };
 		AAAABBBB0000000000000020 /* TockSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 161616160000000000000016 /* TockSettings.swift */; };
 		AAAABBBB0000000000000021 /* TockSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 171717170000000000000017 /* TockSettingsView.swift */; };
+		AAAABBBB0000000000000035 /* Hotkey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 262626260000000000000026 /* Hotkey.swift */; };
+		AAAABBBB0000000000000036 /* HotkeyAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 272727270000000000000027 /* HotkeyAction.swift */; };
+		AAAABBBB0000000000000038 /* KeyboardShortcutsNames.swift in Sources */ = {isa = PBXBuildFile; fileRef = 292929290000000000000029 /* KeyboardShortcutsNames.swift */; };
+		AAAABBBB000000000000003A /* KeyboardShortcutsRecorderRepresentable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A2A2A2A000000000000002A /* KeyboardShortcutsRecorderRepresentable.swift */; };
 		AAAABBBB0000000000000022 /* Sounds/alarm-frenzy.wav in Resources */ = {isa = PBXBuildFile; fileRef = 181818180000000000000018 /* Sounds/alarm-frenzy.wav */; };
 		AAAABBBB0000000000000023 /* Sounds/discreet.wav in Resources */ = {isa = PBXBuildFile; fileRef = 191919190000000000000019 /* Sounds/discreet.wav */; };
 		AAAABBBB0000000000000024 /* Sounds/fingerlicking.wav in Resources */ = {isa = PBXBuildFile; fileRef = 1A1A1A1A000000000000001A /* Sounds/fingerlicking.wav */; };
@@ -29,6 +33,7 @@
 		AAAABBBB0000000000000032 /* Sounds/wailing.wav in Resources */ = {isa = PBXBuildFile; fileRef = 232323230000000000000023 /* Sounds/wailing.wav */; };
 		AAAABBBB0000000000000034 /* Sounds/wake-up.wav in Resources */ = {isa = PBXBuildFile; fileRef = 252525250000000000000025 /* Sounds/wake-up.wav */; };
 		AAAABBBB0000000000000033 /* Sounds/whistling.wav in Resources */ = {isa = PBXBuildFile; fileRef = 242424240000000000000024 /* Sounds/whistling.wav */; };
+		AAAABBBB0000000000000039 /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 3A3A3A3A000000000000003A /* KeyboardShortcuts */; };
 		AAAABBBB0000000000000027 /* SettingsWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D1D1D1D000000000000001D /* SettingsWindowController.swift */; };
 /* End PBXBuildFile section */
 
@@ -50,6 +55,10 @@
 		232323230000000000000023 /* Sounds/wailing.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = "Sounds/wailing.wav"; sourceTree = "<group>"; };
 		252525250000000000000025 /* Sounds/wake-up.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = "Sounds/wake-up.wav"; sourceTree = "<group>"; };
 		242424240000000000000024 /* Sounds/whistling.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = "Sounds/whistling.wav"; sourceTree = "<group>"; };
+		262626260000000000000026 /* Hotkey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Hotkey.swift; sourceTree = "<group>"; };
+		272727270000000000000027 /* HotkeyAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotkeyAction.swift; sourceTree = "<group>"; };
+		292929290000000000000029 /* KeyboardShortcutsNames.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardShortcutsNames.swift; sourceTree = "<group>"; };
+		2A2A2A2A000000000000002A /* KeyboardShortcutsRecorderRepresentable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardShortcutsRecorderRepresentable.swift; sourceTree = "<group>"; };
 		1D1D1D1D000000000000001D /* SettingsWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsWindowController.swift; sourceTree = "<group>"; };
 		222222220000000000000008 /* TockApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TockApp.swift; sourceTree = "<group>"; };
 		333333330000000000000009 /* TockModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TockModel.swift; sourceTree = "<group>"; };
@@ -65,6 +74,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AAAABBBB0000000000000039 /* KeyboardShortcuts in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -88,6 +98,10 @@
 				44444444000000000000000A /* TockMenuView.swift */,
 				161616160000000000000016 /* TockSettings.swift */,
 				171717170000000000000017 /* TockSettingsView.swift */,
+				262626260000000000000026 /* Hotkey.swift */,
+				272727270000000000000027 /* HotkeyAction.swift */,
+				292929290000000000000029 /* KeyboardShortcutsNames.swift */,
+				2A2A2A2A000000000000002A /* KeyboardShortcutsRecorderRepresentable.swift */,
 				1D1D1D1D000000000000001D /* SettingsWindowController.swift */,
 				141414140000000000000014 /* MenuDismissAction.swift */,
 				151515150000000000000015 /* AppIcon.icns */,
@@ -142,6 +156,9 @@
 			dependencies = (
 			);
 			name = Tock;
+			packageProductDependencies = (
+				3A3A3A3A000000000000003A /* KeyboardShortcuts */,
+			);
 			productName = Tock;
 			productReference = 99999999000000000000000F /* Tock.app */;
 			productType = "com.apple.product-type.application";
@@ -165,6 +182,9 @@
 				Base,
 			);
 			mainGroup = BBBBBBBB0000000000000002;
+			packageReferences = (
+				3B3B3B3B000000000000003B /* KeyboardShortcuts */,
+			);
 			productRefGroup = CCCCCCCC0000000000000003 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -210,12 +230,35 @@
 				AAAABBBB0000000000000013 /* TockMenuView.swift in Sources */,
 				AAAABBBB0000000000000020 /* TockSettings.swift in Sources */,
 				AAAABBBB0000000000000021 /* TockSettingsView.swift in Sources */,
+				AAAABBBB0000000000000035 /* Hotkey.swift in Sources */,
+				AAAABBBB0000000000000036 /* HotkeyAction.swift in Sources */,
+				AAAABBBB0000000000000038 /* KeyboardShortcutsNames.swift in Sources */,
+				AAAABBBB000000000000003A /* KeyboardShortcutsRecorderRepresentable.swift in Sources */,
 				AAAABBBB0000000000000027 /* SettingsWindowController.swift in Sources */,
 				AAAABBBB0000000000000018 /* MenuDismissAction.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		3B3B3B3B000000000000003B /* KeyboardShortcuts */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sindresorhus/KeyboardShortcuts";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.16.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		3A3A3A3A000000000000003A /* KeyboardShortcuts */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3B3B3B3B000000000000003B /* KeyboardShortcuts */;
+			productName = KeyboardShortcuts;
+		};
+/* End XCSwiftPackageProductDependency section */
 
 /* Begin XCBuildConfiguration section */
 		C3C3C3C300000000000000C3 /* Debug */ = {
