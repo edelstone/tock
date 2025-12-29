@@ -7,6 +7,7 @@ enum TockSettingsKeys {
   static let defaultUnit = "defaultTimeUnit"
   static let openHotkey = "hotkeyOpen"
   static let clearHotkey = "hotkeyClear"
+  static let didPromptLoginItem = "didPromptLoginItem"
 }
 
 enum NotificationTone: String, CaseIterable, Identifiable {

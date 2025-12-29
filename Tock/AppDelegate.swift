@@ -2,6 +2,7 @@ import AppKit
 import SwiftUI
 import Combine
 import Carbon
+import ServiceManagement
 
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopoverDelegate {
@@ -45,6 +46,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
     bindModel()
     updateStatusItem()
     configureHotkeys()
+    DispatchQueue.main.async { [weak self] in
+      self?.promptForLaunchAtLoginIfNeeded()
+    }
   }
 
   private func terminateOtherInstances() {
@@ -53,6 +57,28 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
     let current = NSRunningApplication.current
     for app in runningApps where app.processIdentifier != current.processIdentifier {
       app.terminate()
+    }
+  }
+
+  private func promptForLaunchAtLoginIfNeeded() {
+    let defaults = UserDefaults.standard
+    guard !defaults.bool(forKey: TockSettingsKeys.didPromptLoginItem) else { return }
+    defaults.set(true, forKey: TockSettingsKeys.didPromptLoginItem)
+
+    if #available(macOS 13.0, *), SMAppService.mainApp.status == .enabled {
+      return
+    }
+
+    let alert = NSAlert()
+    alert.messageText = "Launch Tock at login?"
+    alert.informativeText = "You can change this later in Settings."
+    alert.addButton(withTitle: "Add")
+    alert.addButton(withTitle: "Not now")
+    NSApp.activate(ignoringOtherApps: true)
+    let response = alert.runModal()
+    guard response == .alertFirstButtonReturn else { return }
+    if #available(macOS 13.0, *) {
+      try? SMAppService.mainApp.register()
     }
   }
 
@@ -168,6 +194,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
     settingsItem.target = self
     menu.addItem(settingsItem)
 
+    if isDebugBuild {
+      menu.addItem(.separator())
+      let resetPromptItem = NSMenuItem(
+        title: "Reset Launch at Login Prompt",
+        action: #selector(resetLaunchAtLoginPrompt),
+        keyEquivalent: ""
+      )
+      resetPromptItem.target = self
+      menu.addItem(resetPromptItem)
+    }
+
     let quitItem = NSMenuItem(title: "Quit Tock", action: #selector(quitApp), keyEquivalent: "q")
     quitItem.target = self
     menu.addItem(quitItem)
@@ -209,6 +246,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
 
   @objc private func quitApp() {
     NSApp.terminate(nil)
+  }
+
+  @objc private func resetLaunchAtLoginPrompt() {
+    UserDefaults.standard.removeObject(forKey: TockSettingsKeys.didPromptLoginItem)
+  }
+
+  private var isDebugBuild: Bool {
+    _isDebugAssertConfiguration()
   }
 
   @objc private func openTimerFromMenu() {

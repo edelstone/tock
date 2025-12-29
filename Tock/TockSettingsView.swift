@@ -1,5 +1,6 @@
 import SwiftUI
 import AVFoundation
+import ServiceManagement
 #if canImport(KeyboardShortcuts)
 import AppKit
 import KeyboardShortcuts
@@ -19,6 +20,9 @@ struct TockSettingsView: View {
   @State private var hasHotkeyConflict = false
   @State private var isUpdatingRecorder = false
   @State private var hotkeyErrorMessage: String?
+  @State private var launchAtLogin = false
+  @State private var isUpdatingLaunchAtLogin = false
+  @State private var launchAtLoginError: String?
 
   private enum FocusField {
     case tone
@@ -43,6 +47,23 @@ struct TockSettingsView: View {
             .font(.system(size: 22, weight: .semibold))
         }
         .frame(maxWidth: .infinity, alignment: .center)
+
+        VStack(spacing: 6) {
+          Toggle("Launch Tock at login", isOn: $launchAtLogin)
+            .toggleStyle(.checkbox)
+            .onChange(of: launchAtLogin) { _, newValue in
+              guard !isUpdatingLaunchAtLogin else { return }
+              setLaunchAtLogin(newValue)
+            }
+            .frame(maxWidth: .infinity, alignment: .center)
+
+          if let launchAtLoginError {
+            Text(launchAtLoginError)
+              .foregroundStyle(.red)
+              .frame(maxWidth: .infinity, alignment: .leading)
+              .fixedSize(horizontal: false, vertical: true)
+          }
+        }
 
         Form {
           Picker("Notification tone", selection: $selectedTone) {
@@ -168,6 +189,7 @@ struct TockSettingsView: View {
             skipTonePreview = true
             selectedTone = NotificationTone.default.rawValue
           }
+          refreshLaunchAtLoginState()
         }
         .onReceive(NotificationCenter.default.publisher(for: Hotkey.registrationFailedNotification)) { notification in
           hotkeyErrorMessage = Self.formatHotkeyError(notification)
@@ -284,6 +306,28 @@ struct TockSettingsView: View {
     hotkeyErrorMessage = nil
   }
   #endif
+
+  private func refreshLaunchAtLoginState() {
+    guard #available(macOS 13.0, *) else { return }
+    isUpdatingLaunchAtLogin = true
+    launchAtLogin = SMAppService.mainApp.status == .enabled
+    isUpdatingLaunchAtLogin = false
+  }
+
+  private func setLaunchAtLogin(_ enabled: Bool) {
+    guard #available(macOS 13.0, *) else { return }
+    do {
+      if enabled {
+        try SMAppService.mainApp.register()
+      } else {
+        try SMAppService.mainApp.unregister()
+      }
+      launchAtLoginError = nil
+    } catch {
+      launchAtLoginError = "Could not update login item."
+    }
+    refreshLaunchAtLoginState()
+  }
 
   private static func formatHotkeyError(_ notification: Notification) -> String {
     guard
