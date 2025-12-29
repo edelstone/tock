@@ -24,7 +24,7 @@ Super-minimal  menu bar timer with natural-language parsing, stopwatch mode, 
    xattr -dr com.apple.quarantine /Applications/Tock.app
    ```
 
-4. On first launch you'll be prompted to add Tock to your login items. You can change this setting later in Tock settings or **System Settings → General → Login Items & Extensions**.
+4. On first launch you'll be prompted to add Tock to your login items. You can change this later in Tock settings or **System Settings → General → Login Items & Extensions**.
 
 ## Usage
 
@@ -42,7 +42,7 @@ Super-minimal  menu bar timer with natural-language parsing, stopwatch mode, 
 
 ## Releasing
 
-See [docs/RELEASING.md](docs/RELEASING.md) for the full release and personal dev workflow.
+See [docs/RELEASING.md](docs/RELEASING.md) for the full release workflow.
 
 ## Credits
 
