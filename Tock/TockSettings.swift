@@ -44,7 +44,7 @@ enum NotificationTone: String, CaseIterable, Identifiable {
     case .joyousChime:
       return "Joyous Chime"
     case .lightHearted:
-      return "Light Hearted"
+      return "Light-Hearted"
     case .openYourEyes:
       return "Open Your Eyes"
     case .rush:
@@ -74,11 +74,11 @@ enum NotificationRepeatOption: Int, CaseIterable, Identifiable {
     case .none:
       return "Once"
     case .five:
-      return "5 times"
+      return "5 Times"
     case .ten:
-      return "10 times"
+      return "10 Times"
     case .infinite:
-      return "Infinitely"
+      return "Until Cleared"
     }
   }
 
@@ -109,7 +109,7 @@ enum NotificationVolume: String, CaseIterable, Identifiable {
   var displayName: String {
     switch self {
     case .ultraLow:
-      return "Ultra Low"
+      return "Very Low"
     case .low:
       return "Low"
     case .medium:

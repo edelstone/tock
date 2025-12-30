@@ -51,7 +51,7 @@ struct TockSettingsView: View {
         .frame(maxWidth: .infinity, alignment: .center)
 
         VStack(spacing: 6) {
-          Toggle("Launch Tock at login", isOn: $launchAtLogin)
+          Toggle("Launch Tock at Login", isOn: $launchAtLogin)
             .toggleStyle(.checkbox)
             .onChange(of: launchAtLogin) { _, newValue in
               guard !isUpdatingLaunchAtLogin else { return }
@@ -69,7 +69,7 @@ struct TockSettingsView: View {
         .padding(.bottom, 8)
 
         Form {
-          Picker("Notification tone", selection: $selectedTone) {
+          Picker("Notification Tone", selection: $selectedTone) {
             ForEach(NotificationTone.allCases) { tone in
               Text(tone.displayName)
                 .tag(tone.rawValue)
@@ -87,7 +87,7 @@ struct TockSettingsView: View {
             playPreviewTone(named: newValue)
           }
 
-          Picker("Play tone", selection: $repeatCount) {
+          Picker("Play Tone", selection: $repeatCount) {
             ForEach(NotificationRepeatOption.allCases) { option in
               Text(option.displayName)
                 .tag(option.rawValue)
@@ -113,7 +113,7 @@ struct TockSettingsView: View {
           }
           .padding(.bottom, 12)
 
-          Picker("Default unit", selection: $defaultUnit) {
+          Picker("Default Unit", selection: $defaultUnit) {
             ForEach(DefaultTimeUnit.allCases) { unit in
               Text(unit.displayName)
                 .tag(unit.rawValue)
@@ -124,7 +124,7 @@ struct TockSettingsView: View {
           .focusEffectDisabled()
           .pickerStyle(.menu)
 
-          Picker("Icon size", selection: $menuBarIconSize) {
+          Picker("Icon Size", selection: $menuBarIconSize) {
             ForEach(MenuBarIconSize.allCases) { size in
               Text(size.displayName)
                 .tag(size.rawValue)
@@ -179,7 +179,7 @@ struct TockSettingsView: View {
               .foregroundStyle(.secondary)
             #endif
           } label: {
-            Text("Clear timer")
+            Text("Clear Timer")
               .alignmentGuide(.firstTextBaseline) { dimensions in
                 dimensions[VerticalAlignment.center]
               }
@@ -373,7 +373,7 @@ struct TockSettingsView: View {
       return "Hotkey registration failed."
     }
 
-    let actionName = action == .open ? "Open Tock" : "Clear timer"
+    let actionName = action == .open ? "Open Tock" : "Clear Timer"
     return "\(actionName) shortcut failed to register (status \(status))."
   }
 
