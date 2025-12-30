@@ -81,6 +81,7 @@ struct TockMenuView: View {
             if model.isPaused {
               if model.isCountdownFinished {
                 model.startStopwatch()
+                dismiss()
               } else {
                 model.resume()
               }
@@ -89,6 +90,7 @@ struct TockMenuView: View {
             }
           } else {
             model.startStopwatch()
+            dismiss()
           }
         } label: {
           Image((model.isRunning && !model.isPaused) ? "pause" : "play")
