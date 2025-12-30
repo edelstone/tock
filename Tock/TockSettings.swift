@@ -8,6 +8,7 @@ enum TockSettingsKeys {
   static let openHotkey = "hotkeyOpen"
   static let clearHotkey = "hotkeyClear"
   static let didPromptLoginItem = "didPromptLoginItem"
+  static let menuBarIconSize = "menuBarIconSize"
 }
 
 enum NotificationTone: String, CaseIterable, Identifiable {
@@ -160,6 +161,27 @@ enum DefaultTimeUnit: String, CaseIterable, Identifiable {
       return 60
     case .hours:
       return 3600
+    }
+  }
+}
+
+enum MenuBarIconSize: String, CaseIterable, Identifiable {
+  case small
+  case medium
+  case large
+
+  static let `default` = MenuBarIconSize.medium
+
+  var id: String { rawValue }
+
+  var displayName: String {
+    switch self {
+    case .small:
+      return "Small"
+    case .medium:
+      return "Medium"
+    case .large:
+      return "Large"
     }
   }
 }

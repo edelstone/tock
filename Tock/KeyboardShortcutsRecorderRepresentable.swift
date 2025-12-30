@@ -10,6 +10,9 @@ final class RecorderContainerView: NSView {
     recorder = KeyboardShortcuts.RecorderCocoa(for: name, onChange: onChange)
     super.init(frame: .zero)
     recorder.focusRingType = .default
+    recorder.wantsLayer = true
+    recorder.layer?.borderWidth = 1
+    recorder.layer?.borderColor = borderColor().cgColor
     recorder.translatesAutoresizingMaskIntoConstraints = false
     addSubview(recorder)
     setContentHuggingPriority(.defaultHigh, for: .vertical)
@@ -29,6 +32,21 @@ final class RecorderContainerView: NSView {
 
   override var intrinsicContentSize: NSSize {
     recorder.intrinsicContentSize
+  }
+
+  override func layout() {
+    super.layout()
+    recorder.layer?.cornerCurve = .continuous
+    recorder.layer?.cornerRadius = recorder.bounds.height / 2
+    recorder.layer?.borderColor = borderColor().cgColor
+  }
+
+  private func borderColor() -> NSColor {
+    let match = effectiveAppearance.bestMatch(from: [.aqua, .darkAqua])
+    if match == .darkAqua {
+      return NSColor.tertiaryLabelColor
+    }
+    return NSColor.separatorColor
   }
 
 }

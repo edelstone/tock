@@ -12,6 +12,7 @@ struct TockSettingsView: View {
   @AppStorage(TockSettingsKeys.repeatCount) private var repeatCount = NotificationRepeatOption.default.rawValue
   @AppStorage(TockSettingsKeys.volume) private var selectedVolume = NotificationVolume.default.rawValue
   @AppStorage(TockSettingsKeys.defaultUnit) private var defaultUnit = DefaultTimeUnit.default.rawValue
+  @AppStorage(TockSettingsKeys.menuBarIconSize) private var menuBarIconSize = MenuBarIconSize.default.rawValue
   @State private var previewPlayer: AVAudioPlayer?
   @State private var previewPlayers: [String: AVAudioPlayer] = [:]
   @State private var skipTonePreview = false
@@ -29,6 +30,7 @@ struct TockSettingsView: View {
     case repeatCount
     case volume
     case defaultUnit
+    case iconSize
   }
 
   var body: some View {
@@ -64,6 +66,7 @@ struct TockSettingsView: View {
               .fixedSize(horizontal: false, vertical: true)
           }
         }
+        .padding(.bottom, 8)
 
         Form {
           Picker("Notification tone", selection: $selectedTone) {
@@ -108,6 +111,7 @@ struct TockSettingsView: View {
           .onChange(of: selectedVolume) { _, _ in
             playPreviewTone(named: selectedTone)
           }
+          .padding(.bottom, 12)
 
           Picker("Default unit", selection: $defaultUnit) {
             ForEach(DefaultTimeUnit.allCases) { unit in
@@ -119,6 +123,18 @@ struct TockSettingsView: View {
           .focused($focusedField, equals: .defaultUnit)
           .focusEffectDisabled()
           .pickerStyle(.menu)
+
+          Picker("Icon size", selection: $menuBarIconSize) {
+            ForEach(MenuBarIconSize.allCases) { size in
+              Text(size.displayName)
+                .tag(size.rawValue)
+            }
+          }
+          .padding(.vertical, 2)
+          .focused($focusedField, equals: .iconSize)
+          .focusEffectDisabled()
+          .pickerStyle(.menu)
+          .padding(.bottom, 12)
 
           LabeledContent {
             #if canImport(KeyboardShortcuts)
@@ -198,6 +214,9 @@ struct TockSettingsView: View {
           if NotificationTone(rawValue: selectedTone) == nil {
             skipTonePreview = true
             selectedTone = NotificationTone.default.rawValue
+          }
+          if MenuBarIconSize(rawValue: menuBarIconSize) == nil {
+            menuBarIconSize = MenuBarIconSize.default.rawValue
           }
           refreshLaunchAtLoginState()
         }

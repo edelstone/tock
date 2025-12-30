@@ -59,6 +59,8 @@ struct TockMenuView: View {
         }
       }
 
+      let pauseDisabled = model.isRunning && !model.isPaused && model.isTimeOfDayCountdown
+
       HStack(spacing: 6) {
         Button {
           SettingsWindowController.shared.show()
@@ -97,6 +99,8 @@ struct TockMenuView: View {
             .frame(width: 28, height: 28)
         }
         .buttonStyle(.borderless)
+        .disabled(pauseDisabled)
+        .opacity(pauseDisabled ? 0.5 : 1)
 
         Button {
           model.stop()

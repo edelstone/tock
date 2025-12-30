@@ -14,6 +14,7 @@ final class TockModel: ObservableObject {
   @Published var isRunning = false
   @Published var isPaused = false
   @Published var inputDuration = ""
+  @Published private(set) var isTimeOfDayCountdown = false
 
   private var timer: Timer?
   private var targetDate: Date?
@@ -47,21 +48,40 @@ final class TockModel: ObservableObject {
     mode == .countdown && isRunning && isPaused && remaining == 0
   }
 
+  var timeOfDayEndTooltip: String? {
+    guard isRunning, mode == .countdown, isTimeOfDayCountdown, !isCountdownFinished else { return nil }
+    guard let targetDate else { return nil }
+    let formatter = DateFormatter()
+    formatter.locale = Locale.current
+    formatter.timeStyle = .short
+    formatter.dateStyle = .none
+    let timeString = formatter.string(from: targetDate)
+    return "Ends at \(timeString)"
+  }
+
   @discardableResult
   func startFromInputs() -> Bool {
-    let duration = parsedDuration()
+    let trimmed = inputDuration.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+    guard !trimmed.isEmpty else { return false }
+    if let interval = parsedTimeOfDayInterval(from: trimmed) {
+      start(duration: interval, isTimeOfDay: true)
+      inputDuration = ""
+      return true
+    }
+    let duration = parsedDuration(from: trimmed)
     guard duration > 0 else { return false }
-    start(duration: duration)
+    start(duration: duration, isTimeOfDay: false)
     inputDuration = ""
     return true
   }
 
-  func start(duration: TimeInterval) {
+  func start(duration: TimeInterval, isTimeOfDay: Bool = false) {
     stop()
     mode = .countdown
     remaining = duration
     isRunning = true
     isPaused = false
+    isTimeOfDayCountdown = isTimeOfDay
     targetDate = Date().addingTimeInterval(duration)
     scheduleTimer()
   }
@@ -72,12 +92,13 @@ final class TockModel: ObservableObject {
     elapsed = 0
     isRunning = true
     isPaused = false
+    isTimeOfDayCountdown = false
     startDate = Date()
     scheduleTimer()
   }
 
   func pause() {
-    guard isRunning, !isPaused else { return }
+    guard isRunning, !isPaused, !isTimeOfDayCountdown else { return }
     isPaused = true
     timer?.invalidate()
     timer = nil
@@ -106,6 +127,7 @@ final class TockModel: ObservableObject {
     startDate = nil
     isRunning = false
     isPaused = false
+    isTimeOfDayCountdown = false
     remaining = 0
     elapsed = 0
     inputDuration = ""
@@ -113,13 +135,9 @@ final class TockModel: ObservableObject {
     stopAlarm()
   }
 
-  private func parsedDuration() -> TimeInterval {
-    let trimmed = inputDuration.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+  private func parsedDuration(from input: String) -> TimeInterval {
+    let trimmed = input.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
     guard !trimmed.isEmpty else { return 0 }
-
-    if let interval = parsedTimeOfDayInterval(from: trimmed) {
-      return interval
-    }
 
     if let interval = parsedColonDuration(from: trimmed) {
       return interval
@@ -323,6 +341,7 @@ final class TockModel: ObservableObject {
     remaining = 0
     isRunning = true
     isPaused = true
+    isTimeOfDayCountdown = false
     targetDate = nil
     mode = .countdown
     startAlarm()

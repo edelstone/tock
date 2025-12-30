@@ -25,12 +25,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
   private var keyMonitor: Any?
 
 
-  private static let statusBarImage: NSImage = {
-    let image = NSImage(named: "hourglass") ?? NSImage()
+  private func statusBarImage() -> NSImage {
+    let baseImage = NSImage(named: "hourglass") ?? NSImage()
+    let image = baseImage.copy() as? NSImage ?? NSImage()
     image.isTemplate = true
-    image.size = NSSize(width: 18, height: 18)
+    image.size = menuBarIconSize()
     return image
-  }()
+  }
 
   private static let popoverWillShowNotification = Notification.Name("TockPopoverWillShow")
 
@@ -120,10 +121,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
       let attributes: [NSAttributedString.Key: Any] = [.font: font]
       button.attributedTitle = NSAttributedString(string: model.formattedRemaining, attributes: attributes)
       button.image = nil
+      button.toolTip = model.timeOfDayEndTooltip
     } else {
       button.title = ""
       button.attributedTitle = NSAttributedString(string: "")
-      button.image = Self.statusBarImage
+      button.image = statusBarImage()
+      button.toolTip = nil
     }
     updateContextMenuItems()
   }
@@ -217,7 +220,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
   private func updateContextMenuItems() {
     guard contextMenu != nil else { return }
     stopwatchItem?.isEnabled = !model.isRunning || model.isCountdownFinished
-    pauseItem?.isEnabled = model.isRunning && !model.isCountdownFinished
+    let pauseAllowed = !model.isTimeOfDayCountdown
+    pauseItem?.isEnabled = model.isRunning && !model.isCountdownFinished && (model.isPaused || pauseAllowed)
     clearItem?.isEnabled = model.isRunning
 
     if model.isPaused {
@@ -299,6 +303,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
     ) { [weak self] _ in
       Task { @MainActor in
         self?.reloadHotkeysFromDefaults()
+        self?.updateStatusItem()
       }
     }
   }
@@ -319,6 +324,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
   private func reloadHotkeysFromDefaults() {
     updateHotkey(.open, newHotkey: Hotkey.load(for: .open))
     updateHotkey(.clear, newHotkey: Hotkey.load(for: .clear))
+  }
+
+  private func menuBarIconSize() -> NSSize {
+    let rawValue = UserDefaults.standard.string(forKey: TockSettingsKeys.menuBarIconSize)
+    let size = MenuBarIconSize(rawValue: rawValue ?? "") ?? .default
+    let pointSize: CGFloat
+    switch size {
+    case .small:
+      pointSize = 16
+    case .medium:
+      pointSize = 18
+    case .large:
+      pointSize = 20
+    }
+    return NSSize(width: pointSize, height: pointSize)
   }
 
   private func updateHotkey(_ action: HotkeyAction, newHotkey: Hotkey?) {
