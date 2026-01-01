@@ -29,7 +29,7 @@ Super-minimal  menu bar timer with natural-language parsing, stopwatch mode, 
 ## Usage
 
 - Enter a duration like `10`, `5m`, `1.5h`, `45 sec`, `17m 45s`, or `25:00`, then press Enter to start.
-- Enter a time of day like `10pm`, `6:15a`, or `noon` to count down until the next occurrence.
+- Enter a time of day like `10pm`, `6:15a`, `330 p.m.`, or `noon` to count down until the next occurrence.
 - Click the play button to start a stopwatch with no countdown.
 - Clear stops the timer and silences any active alarm.
 - Quit the app via context (right-click) menu or open the popover and type ⌘-Q.

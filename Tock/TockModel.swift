@@ -258,6 +258,7 @@ final class TockModel: ObservableObject {
 
   private func parsedTimeOfDayInterval(from input: String) -> TimeInterval? {
     var compact = input.replacingOccurrences(of: " ", with: "")
+    compact = compact.replacingOccurrences(of: ".", with: "")
     if compact == "noon" {
       return intervalUntil(hour: 12, minute: 0)
     }
@@ -275,6 +276,16 @@ final class TockModel: ObservableObject {
 
     guard compact.contains("am") || compact.contains("pm") else {
       return nil
+    }
+
+    if !compact.contains(":") {
+      let suffix = compact.suffix(2)
+      let prefix = compact.dropLast(2)
+      if (suffix == "am" || suffix == "pm"), prefix.count >= 3, prefix.allSatisfy({ $0.isNumber }) {
+        let minutes = prefix.suffix(2)
+        let hours = prefix.dropLast(2)
+        compact = "\(hours):\(minutes)\(suffix)"
+      }
     }
 
     let formats = ["h:mma", "ha", "H:mm", "HH:mm"]
