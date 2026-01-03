@@ -25,7 +25,7 @@
     <div class="cta">
       <div class="download-cta">
         <a class="button" href="https://github.com/edelstone/tock/releases/latest/download/Tock.dmg">Download for macOS</a>
-        <p class="download-meta" data-version>Latest version: —</p>
+        <p class="download-meta" data-version>Latest: —</p>
       </div>
       <a class="button button-secondary" href="help/">How it works</a>
     </div>
@@ -110,7 +110,7 @@
             return;
           }
           const version = data.tag_name.replace(/^v/, "");
-          meta.textContent = `Latest version: v${version}`;
+          meta.textContent = `Latest: v${version}`;
         })
         .catch(() => {});
     })();
