@@ -116,7 +116,7 @@ a:not(.button):hover {
 .feature-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 2.5rem 5.5rem;
+  gap: 2.5rem 3.5rem;
   align-items: start;
 }
 
@@ -137,6 +137,7 @@ a:not(.button):hover {
 
 .feature-item p {
   margin: 0;
+  max-width: 9rem;
 }
 
 .footer {

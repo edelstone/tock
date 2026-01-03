@@ -1,8 +1,6 @@
 # Releasing
 
-The canonical release artifact is the signed + notarized DMG you build locally.
-
-GitHub Actions only creates the GitHub Release page and runs an unsigned build check when a version tag is pushed. You upload the signed DMG to that release.
+Build the signed + notarized DMG locally, then upload it to the GitHub Release.
 
 ## Prerequisites
 
@@ -16,7 +14,7 @@ Open `Tock.xcodeproj`, select the `Tock` scheme, and run from Xcode.
 
 ## Signed & notarized DMG (Developer ID)
 
-Use this flow for the official non–App Store release (v0.1.23+). It produces a signed, notarized, stapled DMG.
+Use this flow for the official non–App Store release. It produces a signed, notarized, and stapled DMG.
 
 1. Ensure app metadata is complete.
    - `Info.plist` includes `CFBundlePackageType` set to `APPL`.
@@ -40,8 +38,11 @@ Use this flow for the official non–App Store release (v0.1.23+). It produces a
    cd /path/to/tock
    rm -rf dist
    mkdir -p dist
-   ./scripts/make-dmg.sh "/path/to/Tock.app" "dist/Tock.dmg"
+   SIGNING_IDENTITY="Developer ID Application: YOUR NAME (TEAMID)" \
+     ./scripts/make-dmg.sh "/path/to/Tock.app" "dist/Tock.dmg"
    ```
+
+   - `SIGNING_IDENTITY` is required; the script will fail if it is missing.
 
 5. Notarize the DMG with `notarytool`.
    - One-time setup (stores credentials in Keychain):
@@ -78,31 +79,22 @@ Use this flow for the official non–App Store release (v0.1.23+). It produces a
 2. Create and push a lightweight tag with the next sequential version number.
    - `git tag v0.1.0`
    - `git push origin v0.1.0`
-3. A GitHub Release is created automatically by CI and is named after the tag.
-4. Upload the signed DMG you produced locally (CI does not upload artifacts).
+3. After tag is pushed, GitHub Actions creates a GitHub Release named after the tag.
+4. Upload the signed DMG you produced locally (GitHub Actions does not upload artifacts).
 
    ```bash
    cd /path/to/tock
    gh release upload v0.1.0 dist/Tock.dmg --clobber
    ```
 
+   - If you see “release not found”, wait for GitHub Actions to finish and retry commands.
 5. Add or update release notes.
-   - If you see “release not found”, wait for CI to finish.
    - `gh release edit v0.1.0 --notes $'Highlights:\n- First item\n- Second item'`
-6. Download and install the DMG from the GitHub Release.
-   - This DMG matches the signed + notarized artifact you uploaded.
-   - If macOS blocks launch:  
-     `xattr -dr com.apple.quarantine /Applications/Tock.app`
+6. Download and install the DMG from the GitHub Release. This DMG will match the signed + notarized artifact you uploaded.
 
-### If CI fails after tagging
+### If GitHub Actions fails after tagging
 
 1. Delete the bad tag locally and remotely.
    - `git tag -d v0.1.0 || true && git push origin :v0.1.0`
 2. Fix the issue.
 3. Re-tag and push again.
-
-## Post-release usage
-
-Use the app installed from the GitHub Release in `/Applications`.
-
-To update, download and reinstall the latest DMG from the Releases page.

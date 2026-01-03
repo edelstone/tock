@@ -46,4 +46,12 @@ hdiutil create \
   -format UDZO \
   "${OUT_PATH}"
 
+if [[ -z "${SIGNING_IDENTITY:-}" ]]; then
+  echo "SIGNING_IDENTITY is required to sign the DMG." >&2
+  exit 1
+fi
+
+codesign --force --sign "${SIGNING_IDENTITY}" "${OUT_PATH}"
+echo "Signed ${OUT_PATH}"
+
 echo "Created ${OUT_PATH}"

@@ -26,8 +26,10 @@ See [docs/RELEASING.md](docs/RELEASING.md) for the full release workflow.
 
 ## Credits
 
-- Tones from [Notification Sounds](https://notificationsounds.com).
-- Icons from [Tabler Icons](https://tabler.io/icons).
+- Tones: [Notification Sounds](https://notificationsounds.com)
+- Icons: [Tabler Icons](https://tabler.io/icons)
+- Typography: [Manrope](https://fonts.google.com/specimen/Manrope)
+- Customizable keyboard shortcuts: [KeyboardShortcuts](https://github.com/sindresorhus/KeyboardShortcuts)
 
 ## License
 
