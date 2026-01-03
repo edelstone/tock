@@ -1,0 +1,182 @@
+:root {
+  color-scheme: light;
+  --font-base: "Manrope", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --radius-base: 8px;
+  --color-bg: #f3e6d3;
+  --color-bg-muted: #dbcfbe;
+  --color-text: #222222;
+  --color-accent: #434343;
+  --color-reverse-text: #f3e6d3;
+  --color-link: #295bac;
+}
+
+html {
+  font-size: 125%;
+}
+
+body {
+  max-width: 40rem;
+  margin: 0 auto;
+  display: grid;
+  align-content: start;
+  justify-items: center;
+  background-color: var(--color-bg);
+  text-align: center;
+  font-family: var(--font-base);
+  color: var(--color-text);
+  font-weight: 500;
+  font-size: 1rem;
+  padding: 4rem 1rem;
+}
+
+main {
+  display: grid;
+  gap: 2rem;
+}
+
+h1 {
+  font-size: 4rem;
+  font-weight: 200;
+  margin: 0;
+}
+
+h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+ul,
+ol {
+  margin-bottom: 0;
+}
+
+a:not(.button) {
+  color: var(--color-link);
+  text-underline-offset: 2px;
+  text-decoration-thickness: 2px;
+  text-decoration: none;
+}
+
+a:not(.button):hover {
+  text-decoration: underline;
+}
+
+.header {
+  margin-bottom: 5rem;
+  width: 100%;
+}
+
+.visual {
+  margin: 2.5rem 0;
+  border: 2px solid var(--color-accent);
+  border-radius: 16px;
+  overflow: hidden;
+  max-width: 28rem;
+  width: 100%;
+  height: auto;
+}
+
+.cta {
+  display: grid;
+  grid-auto-flow: column;
+  justify-content: center;
+  gap: .75rem;
+}
+
+.button {
+  display: inline-grid;
+  place-items: center;
+  padding: .5rem 1rem;
+  border-radius: var(--radius-base);
+  background-color: var(--color-link);
+  color: var(--color-reverse-text);
+  text-decoration: none;
+  transition: opacity 160ms ease-out;
+}
+
+.button:hover {
+  opacity: .9;
+}
+
+.button:active {
+  opacity: 1;
+}
+
+.button-secondary {
+  background-color: var(--color-bg-muted);
+  color: var(--color-text);
+}
+
+.features {
+  display: grid;
+  gap: 2.5rem;
+}
+
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 2.5rem 5.5rem;
+  align-items: start;
+}
+
+.feature-item {
+  display: grid;
+  grid-template-rows: auto auto;
+  gap: 0.75rem;
+  justify-items: center;
+  align-content: start;
+  text-align: center;
+}
+
+.feature-item .icon {
+  width: 2rem;
+  height: 2rem;
+  color: var(--color-accent);
+}
+
+.feature-item p {
+  margin: 0;
+}
+
+.footer {
+  display: grid;
+  grid-auto-flow: column;
+  gap: 2rem;
+  margin-top: 5rem;
+}
+
+.docs .header {
+  margin-bottom: 4rem;
+  text-align: left;
+}
+
+.docs main {
+  text-align: left;
+}
+
+.home-link {
+  position: relative;
+}
+
+.not-found .header {
+  margin-bottom: 0;
+}
+
+.not-found .visual {
+  margin: 2rem 0 0;
+}
+
+@media (max-width: 600px) {
+  html {
+    font-size: 115%;
+  }
+
+  h1 {
+    font-size: 3rem;
+  }
+
+  .feature-grid {
+    grid-template-columns: 1fr;
+  }
+}

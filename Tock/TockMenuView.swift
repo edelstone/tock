@@ -3,6 +3,9 @@ import SwiftUI
 struct TockMenuView: View {
   @EnvironmentObject private var model: TockModel
   @Environment(\.menuDismiss) private var dismiss
+  @Environment(\.colorScheme) private var colorScheme
+  @AppStorage(TockSettingsKeys.menuButtonSize) private var menuButtonSize = MenuButtonSize.default.rawValue
+  @AppStorage(TockSettingsKeys.menuButtonBrightness) private var menuButtonBrightness = MenuButtonBrightness.default.rawValue
   @State private var placeholder = Self.randomSuggestion()
   @FocusState private var isInputFocused: Bool
 
@@ -19,7 +22,45 @@ struct TockMenuView: View {
     suggestions.randomElement() ?? "10s"
   }
 
+  private struct IconStyle {
+    let color: Color
+    let opacity: Double
+    let shadowColor: Color
+    let shadowRadius: CGFloat
+  }
+
+  private func iconStyle(for brightness: MenuButtonBrightness, scheme: ColorScheme) -> IconStyle {
+    switch brightness {
+    case .dim:
+      return IconStyle(
+        color: .primary,
+        opacity: 0.4,
+        shadowColor: .clear,
+        shadowRadius: 0
+      )
+    case .normal:
+      return IconStyle(
+        color: .primary,
+        opacity: 0.65,
+        shadowColor: .clear,
+        shadowRadius: 0
+      )
+    case .bright:
+      let color: Color = scheme == .light ? .black : .white
+      let shadowColor: Color = scheme == .light ? .clear : .white.opacity(0.45)
+      return IconStyle(
+        color: color,
+        opacity: 0.9,
+        shadowColor: shadowColor,
+        shadowRadius: scheme == .light ? 0 : 1.1
+      )
+    }
+  }
+
   var body: some View {
+    let buttonSize = MenuButtonSize(rawValue: menuButtonSize) ?? .default
+    let brightnessSetting = MenuButtonBrightness(rawValue: menuButtonBrightness) ?? .default
+    let style = iconStyle(for: brightnessSetting, scheme: colorScheme)
     VStack(alignment: .leading, spacing: 12) {
       ZStack(alignment: .leading) {
         if model.inputDuration.isEmpty {
@@ -70,8 +111,11 @@ struct TockMenuView: View {
             .renderingMode(.template)
             .resizable()
             .scaledToFit()
-            .frame(width: 20, height: 20)
-            .frame(width: 28, height: 28)
+            .frame(width: buttonSize.iconPointSize, height: buttonSize.iconPointSize)
+            .frame(width: buttonSize.buttonPointSize, height: buttonSize.buttonPointSize)
+            .foregroundStyle(style.color)
+            .opacity(style.opacity)
+            .shadow(color: style.shadowColor, radius: style.shadowRadius)
         }
         .buttonStyle(.borderless)
 
@@ -97,8 +141,11 @@ struct TockMenuView: View {
             .renderingMode(.template)
             .resizable()
             .scaledToFit()
-            .frame(width: 20, height: 20)
-            .frame(width: 28, height: 28)
+            .frame(width: buttonSize.iconPointSize, height: buttonSize.iconPointSize)
+            .frame(width: buttonSize.buttonPointSize, height: buttonSize.buttonPointSize)
+            .foregroundStyle(style.color)
+            .opacity(style.opacity)
+            .shadow(color: style.shadowColor, radius: style.shadowRadius)
         }
         .buttonStyle(.borderless)
         .disabled(pauseDisabled)
@@ -112,8 +159,11 @@ struct TockMenuView: View {
             .renderingMode(.template)
             .resizable()
             .scaledToFit()
-            .frame(width: 20, height: 20)
-            .frame(width: 28, height: 28)
+            .frame(width: buttonSize.iconPointSize, height: buttonSize.iconPointSize)
+            .frame(width: buttonSize.buttonPointSize, height: buttonSize.buttonPointSize)
+            .foregroundStyle(style.color)
+            .opacity(style.opacity)
+            .shadow(color: style.shadowColor, radius: style.shadowRadius)
         }
         .buttonStyle(.borderless)
         .disabled(!model.isRunning)
@@ -122,6 +172,13 @@ struct TockMenuView: View {
     }
     .padding(16)
     .frame(width: 210)
+    .background(
+      Color.clear
+        .contentShape(Rectangle())
+        .onTapGesture {
+          isInputFocused = false
+        }
+    )
   }
 }
 

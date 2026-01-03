@@ -9,6 +9,9 @@ DerivedData/
 *.xcworkspace/xcuserdata/
 build/
 dist/
+node_modules/
+AGENTS.md
+buildServer.json
 *.ipa
 *.dSYM.zip
 *.dSYM

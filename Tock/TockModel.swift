@@ -26,6 +26,7 @@ final class TockModel: ObservableObject {
   private let timerInterval: TimeInterval = 0.25
   private let timerTolerance: TimeInterval = 0.05
   private let alarmMinInterval: TimeInterval = 0.1
+  private var lastDisplayedSecond: Int?
 
   var formattedRemaining: String {
     let total: Int
@@ -56,6 +57,10 @@ final class TockModel: ObservableObject {
     formatter.timeStyle = .short
     formatter.dateStyle = .none
     let timeString = formatter.string(from: targetDate)
+      .replacingOccurrences(of: "AM", with: "a.m.")
+      .replacingOccurrences(of: "PM", with: "p.m.")
+      .replacingOccurrences(of: "am", with: "a.m.")
+      .replacingOccurrences(of: "pm", with: "p.m.")
     return "Ends at \(timeString)"
   }
 
@@ -63,6 +68,11 @@ final class TockModel: ObservableObject {
   func startFromInputs() -> Bool {
     let trimmed = inputDuration.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
     guard !trimmed.isEmpty else { return false }
+    if trimmed == "sw" || trimmed == "stopwatch" {
+      startStopwatch()
+      inputDuration = ""
+      return true
+    }
     if let interval = parsedTimeOfDayInterval(from: trimmed) {
       start(duration: interval, isTimeOfDay: true)
       inputDuration = ""
@@ -83,6 +93,7 @@ final class TockModel: ObservableObject {
     isPaused = false
     isTimeOfDayCountdown = isTimeOfDay
     targetDate = Date().addingTimeInterval(duration)
+    lastDisplayedSecond = nil
     scheduleTimer()
   }
 
@@ -94,6 +105,7 @@ final class TockModel: ObservableObject {
     isPaused = false
     isTimeOfDayCountdown = false
     startDate = Date()
+    lastDisplayedSecond = nil
     scheduleTimer()
   }
 
@@ -112,10 +124,12 @@ final class TockModel: ObservableObject {
       guard remaining > 0 else { return }
       isPaused = false
       targetDate = Date().addingTimeInterval(remaining)
+      lastDisplayedSecond = nil
       scheduleTimer()
     case .stopwatch:
       isPaused = false
       startDate = Date().addingTimeInterval(-elapsed)
+      lastDisplayedSecond = nil
       scheduleTimer()
     }
   }
@@ -132,6 +146,7 @@ final class TockModel: ObservableObject {
     elapsed = 0
     inputDuration = ""
     mode = .countdown
+    lastDisplayedSecond = nil
     stopAlarm()
   }
 
@@ -200,9 +215,19 @@ final class TockModel: ObservableObject {
     let compact = input.replacingOccurrences(of: " ", with: "")
     guard !compact.contains("am"), !compact.contains("pm") else { return nil }
 
-    let parts = compact.split(separator: ":")
+    let parts = compact.split(separator: ":", omittingEmptySubsequences: false)
     guard parts.count == 2 || parts.count == 3 else { return nil }
-    guard let first = Int(parts[0]), let second = Int(parts[1]) else { return nil }
+    let firstPart = String(parts[0])
+    let secondPart = String(parts[1])
+    let first: Int
+    if firstPart.isEmpty, compact.hasPrefix(":") {
+      first = 0
+    } else if let parsed = Int(firstPart) {
+      first = parsed
+    } else {
+      return nil
+    }
+    guard let second = Int(secondPart) else { return nil }
     guard first >= 0, second >= 0 else { return nil }
 
     if parts.count == 2 {
@@ -338,11 +363,20 @@ final class TockModel: ObservableObject {
       if newRemaining <= 0 {
         finish()
       } else {
-        remaining = newRemaining
+        let displaySeconds = max(0, Int(ceil(newRemaining)))
+        if displaySeconds != lastDisplayedSecond {
+          remaining = newRemaining
+          lastDisplayedSecond = displaySeconds
+        }
       }
     case .stopwatch:
       guard let startDate else { return }
-      elapsed = Date().timeIntervalSince(startDate)
+      let newElapsed = Date().timeIntervalSince(startDate)
+      let displaySeconds = max(0, Int(newElapsed.rounded()))
+      if displaySeconds != lastDisplayedSecond {
+        elapsed = newElapsed
+        lastDisplayedSecond = displaySeconds
+      }
     }
   }
 

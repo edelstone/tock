@@ -13,10 +13,13 @@ struct TockSettingsView: View {
   @AppStorage(TockSettingsKeys.volume) private var selectedVolume = NotificationVolume.default.rawValue
   @AppStorage(TockSettingsKeys.defaultUnit) private var defaultUnit = DefaultTimeUnit.default.rawValue
   @AppStorage(TockSettingsKeys.menuBarIconSize) private var menuBarIconSize = MenuBarIconSize.default.rawValue
+  @AppStorage(TockSettingsKeys.menuButtonSize) private var menuButtonSize = MenuButtonSize.default.rawValue
+  @AppStorage(TockSettingsKeys.menuButtonBrightness) private var menuButtonBrightness = MenuButtonBrightness.default.rawValue
   @State private var previewPlayer: AVAudioPlayer?
   @State private var previewPlayers: [String: AVAudioPlayer] = [:]
   @State private var skipTonePreview = false
   @State private var openHotkey: Hotkey?
+  @State private var pauseResumeHotkey: Hotkey?
   @State private var clearHotkey: Hotkey?
   @State private var hasHotkeyConflict = false
   @State private var isUpdatingRecorder = false
@@ -31,6 +34,8 @@ struct TockSettingsView: View {
     case volume
     case defaultUnit
     case iconSize
+    case buttonSize
+    case buttonBrightness
   }
 
   var body: some View {
@@ -134,6 +139,28 @@ struct TockSettingsView: View {
           .focused($focusedField, equals: .iconSize)
           .focusEffectDisabled()
           .pickerStyle(.menu)
+
+          Picker("Button Size", selection: $menuButtonSize) {
+            ForEach(MenuButtonSize.allCases) { size in
+              Text(size.displayName)
+                .tag(size.rawValue)
+            }
+          }
+          .padding(.vertical, 2)
+          .focused($focusedField, equals: .buttonSize)
+          .focusEffectDisabled()
+          .pickerStyle(.menu)
+
+          Picker("Button Brightness", selection: $menuButtonBrightness) {
+            ForEach(MenuButtonBrightness.allCases) { brightness in
+              Text(brightness.displayName)
+                .tag(brightness.rawValue)
+            }
+          }
+          .padding(.vertical, 2)
+          .focused($focusedField, equals: .buttonBrightness)
+          .focusEffectDisabled()
+          .pickerStyle(.menu)
           .padding(.bottom, 12)
 
           LabeledContent {
@@ -155,6 +182,31 @@ struct TockSettingsView: View {
             #endif
           } label: {
             Text("Open Tock")
+              .alignmentGuide(.firstTextBaseline) { dimensions in
+                dimensions[VerticalAlignment.center]
+              }
+          }
+          .padding(.vertical, 2)
+
+          LabeledContent {
+            #if canImport(KeyboardShortcuts)
+            KeyboardShortcutsRecorderRepresentable(
+              name: .pauseResumeRecorder,
+              onChange: { shortcut in
+                handleRecorderChange(action: .pauseResume, shortcut: shortcut)
+              }
+            )
+            .frame(width: 110)
+            .padding(.leading, 12)
+            .alignmentGuide(.firstTextBaseline) { dimensions in
+              dimensions[VerticalAlignment.center]
+            }
+            #else
+            Text("Add KeyboardShortcuts")
+              .foregroundStyle(.secondary)
+            #endif
+          } label: {
+            Text("Pause/Resume")
               .alignmentGuide(.firstTextBaseline) { dimensions in
                 dimensions[VerticalAlignment.center]
               }
@@ -187,7 +239,7 @@ struct TockSettingsView: View {
           .padding(.vertical, 2)
 
           if hasHotkeyConflict {
-            Text("Open and Clear shortcuts must be different.")
+            Text("Open, Pause/Resume, and Clear shortcuts must be different.")
               .foregroundStyle(.red)
           }
           if let hotkeyErrorMessage {
@@ -217,6 +269,12 @@ struct TockSettingsView: View {
           }
           if MenuBarIconSize(rawValue: menuBarIconSize) == nil {
             menuBarIconSize = MenuBarIconSize.default.rawValue
+          }
+          if MenuButtonSize(rawValue: menuButtonSize) == nil {
+            menuButtonSize = MenuButtonSize.default.rawValue
+          }
+          if MenuButtonBrightness(rawValue: menuButtonBrightness) == nil {
+            menuButtonBrightness = MenuButtonBrightness.default.rawValue
           }
           refreshLaunchAtLoginState()
         }
@@ -291,13 +349,14 @@ struct TockSettingsView: View {
 
   private func loadHotkeysFromDefaults() {
     openHotkey = Hotkey.load(for: .open)
+    pauseResumeHotkey = Hotkey.load(for: .pauseResume)
     clearHotkey = Hotkey.load(for: .clear)
     updateHotkeyConflict()
     syncRecorderFromDefaults()
   }
 
   private func updateHotkeyConflict() {
-    hasHotkeyConflict = openHotkey != nil && openHotkey == clearHotkey
+    hasHotkeyConflict = hotkeysHaveConflict([openHotkey, pauseResumeHotkey, clearHotkey])
     if hasHotkeyConflict {
       hotkeyErrorMessage = nil
     }
@@ -307,6 +366,7 @@ struct TockSettingsView: View {
     #if canImport(KeyboardShortcuts)
     isUpdatingRecorder = true
     Hotkey.updateRecorderUI(openHotkey, name: .openRecorder)
+    Hotkey.updateRecorderUI(pauseResumeHotkey, name: .pauseResumeRecorder)
     Hotkey.updateRecorderUI(clearHotkey, name: .clearRecorder)
     isUpdatingRecorder = false
     #endif
@@ -316,7 +376,15 @@ struct TockSettingsView: View {
   private func handleRecorderChange(action: HotkeyAction, shortcut: KeyboardShortcuts.Shortcut?) {
     guard !isUpdatingRecorder else { return }
     let proposed = Hotkey(keyboardShortcut: shortcut)
-    let recorderName: KeyboardShortcuts.Name = action == .open ? .openRecorder : .clearRecorder
+    let recorderName: KeyboardShortcuts.Name
+    switch action {
+    case .open:
+      recorderName = .openRecorder
+    case .pauseResume:
+      recorderName = .pauseResumeRecorder
+    case .clear:
+      recorderName = .clearRecorder
+    }
     Hotkey.updateRecorderUI(proposed, name: recorderName)
     if let proposed, !Hotkey.isValid(modifierFlags: proposed.modifierFlags) {
       syncRecorderFromDefaults()
@@ -324,19 +392,24 @@ struct TockSettingsView: View {
     }
 
     var nextOpen = openHotkey
+    var nextPauseResume = pauseResumeHotkey
     var nextClear = clearHotkey
     switch action {
     case .open:
       nextOpen = proposed
+    case .pauseResume:
+      nextPauseResume = proposed
     case .clear:
       nextClear = proposed
     }
 
-    hasHotkeyConflict = nextOpen != nil && nextOpen == nextClear
+    hasHotkeyConflict = hotkeysHaveConflict([nextOpen, nextPauseResume, nextClear])
     guard !hasHotkeyConflict else { return }
     openHotkey = nextOpen
+    pauseResumeHotkey = nextPauseResume
     clearHotkey = nextClear
     Hotkey.save(openHotkey, for: .open)
+    Hotkey.save(pauseResumeHotkey, for: .pauseResume)
     Hotkey.save(clearHotkey, for: .clear)
     hotkeyErrorMessage = nil
   }
@@ -373,10 +446,29 @@ struct TockSettingsView: View {
       return "Hotkey registration failed."
     }
 
-    let actionName = action == .open ? "Open Tock" : "Clear Timer"
+    let actionName: String
+    switch action {
+    case .open:
+      actionName = "Open Tock"
+    case .pauseResume:
+      actionName = "Pause/Resume"
+    case .clear:
+      actionName = "Clear Timer"
+    }
     return "\(actionName) shortcut failed to register (status \(status))."
   }
 
+}
+
+private func hotkeysHaveConflict(_ hotkeys: [Hotkey?]) -> Bool {
+  var seen: [Hotkey] = []
+  for hotkey in hotkeys.compactMap({ $0 }) {
+    if seen.contains(hotkey) {
+      return true
+    }
+    seen.append(hotkey)
+  }
+  return false
 }
 
 private struct AppIconView: View {

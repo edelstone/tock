@@ -1,0 +1,12 @@
+{
+  "name": "tock",
+  "private": true,
+  "scripts": {
+    "serve": "browser-sync start --config bs-config.js",
+    "dev": "npm run serve",
+    "start": "npm run dev"
+  },
+  "devDependencies": {
+    "browser-sync": "^2.29.3"
+  }
+}

@@ -25,19 +25,10 @@ jobs:
             exit 1
           fi
 
-      - name: Build app and DMG
+      - name: Build app (unsigned)
         run: |
           VERSION="${GITHUB_REF_NAME#v}"
           xcodebuild -scheme Tock -configuration Release -derivedDataPath build CODE_SIGNING_ALLOWED=NO MARKETING_VERSION="${VERSION}"
-          APP_PATH="build/Build/Products/Release/Tock.app"
-          if [ ! -d "${APP_PATH}" ]; then
-            echo "App not found at ${APP_PATH}"
-            ls -la build/Build/Products/Release
-            exit 1
-          fi
-          ./scripts/make-dmg.sh "${APP_PATH}" "dist/Tock.dmg"
 
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
-        with:
-          files: dist/Tock.dmg

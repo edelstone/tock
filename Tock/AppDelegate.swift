@@ -11,19 +11,41 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
   private let model = TockModel()
   private var cancellables = Set<AnyCancellable>()
   private var hotKeyRef: EventHotKeyRef?
+  private var pauseResumeHotKeyRef: EventHotKeyRef?
   private var trashHotKeyRef: EventHotKeyRef?
   private var hotKeyHandlerRef: EventHandlerRef?
   private var currentOpenHotkey: Hotkey?
+  private var currentPauseResumeHotkey: Hotkey?
   private var currentClearHotkey: Hotkey?
   private var hotkeyDefaultsObserver: NSObjectProtocol?
   private var hotkeyChangeObserver: NSObjectProtocol?
   private var contextMenu: NSMenu?
+  private var openItem: NSMenuItem?
   private var stopwatchItem: NSMenuItem?
   private var pauseItem: NSMenuItem?
   private var clearItem: NSMenuItem?
   private var eventMonitor: Any?
   private var keyMonitor: Any?
+  private var lastStatusItemState: StatusItemState?
 
+  private struct StatusItemState: Equatable {
+    let isRunning: Bool
+    let displayText: String
+    let tooltip: String?
+    let iconSize: NSSize
+  }
+
+  private func currentStatusItemState() -> StatusItemState {
+    let isRunning = model.isRunning
+    let displayText = isRunning ? model.formattedRemaining : ""
+    let tooltip = isRunning ? model.timeOfDayEndTooltip : nil
+    return StatusItemState(
+      isRunning: isRunning,
+      displayText: displayText,
+      tooltip: tooltip,
+      iconSize: menuBarIconSize()
+    )
+  }
 
   private func statusBarImage() -> NSImage {
     let baseImage = NSImage(named: "hourglass") ?? NSImage()
@@ -116,12 +138,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
 
   private func updateStatusItem() {
     guard let button = statusItem.button else { return }
-    if model.isRunning {
+    let state = currentStatusItemState()
+    if state == lastStatusItemState {
+      return
+    }
+    lastStatusItemState = state
+    if state.isRunning {
       let font = NSFont.monospacedDigitSystemFont(ofSize: NSFont.systemFontSize, weight: .regular)
       let attributes: [NSAttributedString.Key: Any] = [.font: font]
-      button.attributedTitle = NSAttributedString(string: model.formattedRemaining, attributes: attributes)
+      button.attributedTitle = NSAttributedString(string: state.displayText, attributes: attributes)
       button.image = nil
-      button.toolTip = model.timeOfDayEndTooltip
+      button.toolTip = state.tooltip
     } else {
       button.title = ""
       button.attributedTitle = NSAttributedString(string: "")
@@ -163,14 +190,23 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
     popover.performClose(nil)
   }
 
+  private func togglePauseResumeFromHotKey() {
+    guard model.isRunning else { return }
+    if model.isPaused {
+      model.resume()
+    } else {
+      model.pause()
+    }
+  }
+
   private func showContextMenu() {
     let menu = NSMenu()
     menu.autoenablesItems = false
     menu.delegate = self
     let openItem = NSMenuItem(title: "Open", action: #selector(openTimerFromMenu), keyEquivalent: "t")
-    openItem.keyEquivalentModifierMask = [.control, .option, .command]
     openItem.target = self
     menu.addItem(openItem)
+    self.openItem = openItem
 
     let startStopwatchItem = NSMenuItem(title: "Stopwatch", action: #selector(startStopwatchFromMenu), keyEquivalent: "")
     startStopwatchItem.target = self
@@ -183,7 +219,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
     pauseItem = newPauseItem
 
     let stopItem = NSMenuItem(title: "Clear", action: #selector(stopTimerFromMenu), keyEquivalent: "x")
-    stopItem.keyEquivalentModifierMask = [.control, .option, .command]
     stopItem.target = self
     menu.addItem(stopItem)
     clearItem = stopItem
@@ -223,6 +258,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
     let pauseAllowed = !model.isTimeOfDayCountdown
     pauseItem?.isEnabled = model.isRunning && !model.isCountdownFinished && (model.isPaused || pauseAllowed)
     clearItem?.isEnabled = model.isRunning
+    applyHotkeyHint(for: .open, to: openItem)
+    applyHotkeyHint(for: .pauseResume, to: pauseItem)
+    applyHotkeyHint(for: .clear, to: clearItem)
 
     if model.isPaused {
       pauseItem?.title = "Restart"
@@ -236,6 +274,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
   func menuDidClose(_ menu: NSMenu) {
     if menu == contextMenu {
       contextMenu = nil
+      openItem = nil
       stopwatchItem = nil
       pauseItem = nil
       clearItem = nil
@@ -284,6 +323,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
     SettingsWindowController.shared.show()
   }
 
+  func openSettingsFromCommand() {
+    popover.performClose(nil)
+    SettingsWindowController.shared.show()
+  }
+
   private func configureHotkeys() {
     #if canImport(KeyboardShortcuts)
     Hotkey.migrateRecorderDefaultsIfNeeded()
@@ -323,6 +367,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
 
   private func reloadHotkeysFromDefaults() {
     updateHotkey(.open, newHotkey: Hotkey.load(for: .open))
+    updateHotkey(.pauseResume, newHotkey: Hotkey.load(for: .pauseResume))
     updateHotkey(.clear, newHotkey: Hotkey.load(for: .clear))
   }
 
@@ -360,6 +405,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
     switch action {
     case .open:
       return currentOpenHotkey
+    case .pauseResume:
+      return currentPauseResumeHotkey
     case .clear:
       return currentClearHotkey
     }
@@ -369,6 +416,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
     switch action {
     case .open:
       currentOpenHotkey = hotkey
+    case .pauseResume:
+      currentPauseResumeHotkey = hotkey
     case .clear:
       currentClearHotkey = hotkey
     }
@@ -403,6 +452,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
     switch action {
     case .open:
       hotKeyRef = registeredHotKey
+    case .pauseResume:
+      pauseResumeHotKeyRef = registeredHotKey
     case .clear:
       trashHotKeyRef = registeredHotKey
     }
@@ -417,6 +468,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
     case .open:
       hotkeyRef = hotKeyRef
       self.hotKeyRef = nil
+    case .pauseResume:
+      hotkeyRef = pauseResumeHotKeyRef
+      pauseResumeHotKeyRef = nil
     case .clear:
       hotkeyRef = trashHotKeyRef
       trashHotKeyRef = nil
@@ -448,6 +502,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
         switch action {
         case .open:
           appDelegate.togglePopoverFromHotKey()
+        case .pauseResume:
+          appDelegate.togglePauseResumeFromHotKey()
         case .clear:
           appDelegate.trashFromHotKey()
         }
@@ -501,5 +557,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
     guard let button = statusItem.button, let window = button.window else { return false }
     let buttonFrame = window.convertToScreen(button.frame)
     return buttonFrame.contains(event.locationInWindow)
+  }
+
+  private func applyHotkeyHint(for action: HotkeyAction, to item: NSMenuItem?) {
+    guard let item else { return }
+    guard let hotkey = Hotkey.load(for: action),
+          let keyEquivalent = hotkey.menuKeyEquivalent else {
+      item.keyEquivalent = ""
+      item.keyEquivalentModifierMask = []
+      return
+    }
+    item.keyEquivalent = keyEquivalent
+    item.keyEquivalentModifierMask = hotkey.modifierFlags
   }
 }

@@ -6,9 +6,12 @@ enum TockSettingsKeys {
   static let volume = "notificationVolume"
   static let defaultUnit = "defaultTimeUnit"
   static let openHotkey = "hotkeyOpen"
+  static let pauseResumeHotkey = "hotkeyPauseResume"
   static let clearHotkey = "hotkeyClear"
   static let didPromptLoginItem = "didPromptLoginItem"
   static let menuBarIconSize = "menuBarIconSize"
+  static let menuButtonSize = "menuButtonSize"
+  static let menuButtonBrightness = "menuButtonBrightness"
 }
 
 enum NotificationTone: String, CaseIterable, Identifiable {
@@ -182,6 +185,70 @@ enum MenuBarIconSize: String, CaseIterable, Identifiable {
       return "Medium"
     case .large:
       return "Large"
+    }
+  }
+}
+
+enum MenuButtonSize: String, CaseIterable, Identifiable {
+  case small
+  case medium
+  case large
+
+  static let `default` = MenuButtonSize.medium
+
+  var id: String { rawValue }
+
+  var displayName: String {
+    switch self {
+    case .small:
+      return "Small"
+    case .medium:
+      return "Medium"
+    case .large:
+      return "Large"
+    }
+  }
+
+  var iconPointSize: CGFloat {
+    switch self {
+    case .small:
+      return 16
+    case .medium:
+      return 20
+    case .large:
+      return 24
+    }
+  }
+
+  var buttonPointSize: CGFloat {
+    switch self {
+    case .small:
+      return 24
+    case .medium:
+      return 28
+    case .large:
+      return 34
+    }
+  }
+}
+
+enum MenuButtonBrightness: String, CaseIterable, Identifiable {
+  case dim
+  case normal
+  case bright
+
+  static let `default` = MenuButtonBrightness.normal
+
+  var id: String { rawValue }
+
+  var displayName: String {
+    switch self {
+    case .dim:
+      return "Dim"
+    case .normal:
+      return "Normal"
+    case .bright:
+      return "Bright"
     }
   }
 }

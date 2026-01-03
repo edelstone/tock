@@ -11,7 +11,7 @@ struct TockApp: App {
     .commands {
       CommandGroup(replacing: .appSettings) {
         Button("Settings…") {
-          SettingsWindowController.shared.show()
+          appDelegate.openSettingsFromCommand()
         }
         .keyboardShortcut(",", modifiers: .command)
       }

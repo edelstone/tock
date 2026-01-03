@@ -150,7 +150,13 @@ struct Hotkey: Codable, Equatable {
     return true
   }
 
-  private static func displayName(for keyCode: UInt16) -> String {
+  var menuKeyEquivalent: String? {
+    let name = Self.displayName(for: keyCode)
+    guard name.count == 1 else { return nil }
+    return name.lowercased()
+  }
+
+  static func displayName(for keyCode: UInt16) -> String {
     switch keyCode {
     case UInt16(kVK_ANSI_A):
       return "A"
