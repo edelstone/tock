@@ -11,6 +11,10 @@ Super-minimal menu bar timer with natural-language parsing, stopwatch mode, and 
 - Context (right-click) menu with most app controls, plus popover UI.
 - Customizable interface elements and global keyboard shortcuts.
 
+## Requirements
+
+- macOS 14 or later
+
 ## Installation
 
 1. Download the latest macOS build:
@@ -18,7 +22,7 @@ Super-minimal menu bar timer with natural-language parsing, stopwatch mode, and 
    [![Download](https://img.shields.io/github/v/release/edelstone/tock?label=Download&logo=apple&style=for-the-badge&color=5865f2)](https://github.com/edelstone/tock/releases/latest/download/Tock.dmg)
 
 2. Drag `Tock.app` to `/Applications`.
-3. On first launch, you'll be prompted to add Tock to your login items. You can change this later in Tock settings or System Settings → General → Login Items & Extensions.
+3. On first launch, you'll be prompted to add Tock to your login items. You can change this later in Settings or System Settings → General → Login Items & Extensions.
 
 ## Releasing
 
@@ -30,6 +34,13 @@ See [docs/RELEASING.md](docs/RELEASING.md) for the full release workflow.
 - Icons: [Tabler Icons](https://tabler.io/icons)
 - Typography: [Manrope](https://fonts.google.com/specimen/Manrope)
 - Customizable keyboard shortcuts: [KeyboardShortcuts](https://github.com/sindresorhus/KeyboardShortcuts)
+
+## Support this project
+
+- [Buy Me a Coffee](https://www.buymeacoffee.com/edelstone)
+- [Cash App](https://cash.app/$edelstone)
+- [Paypal](https://www.paypal.me/edelstone)
+- [Venmo](https://venmo.com/michaeledelstone)
 
 ## License
 

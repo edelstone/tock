@@ -67,7 +67,7 @@ struct TockSettingsView: View {
             }
             .frame(maxWidth: .infinity, alignment: .center)
 
-          Toggle("Show notifications", isOn: $showNotifications)
+          Toggle("Show Notifications", isOn: $showNotifications)
             .toggleStyle(.checkbox)
             .onChange(of: showNotifications) { _, newValue in
               handleShowNotificationsChange(newValue)
@@ -267,10 +267,6 @@ struct TockSettingsView: View {
               .fixedSize(horizontal: false, vertical: true)
           }
         }
-        Text(Self.appVersionText)
-          .font(.system(size: 12, weight: .regular))
-          .foregroundStyle(.secondary)
-          .padding(.top, 6)
         .onAppear {
           DispatchQueue.main.async {
             focusedField = .tone
@@ -314,12 +310,6 @@ struct TockSettingsView: View {
     .onReceive(NotificationCenter.default.publisher(for: SettingsWindowController.settingsDidResignKeyNotification)) { _ in
       stopPreviewTone()
     }
-  }
-
-  private static var appVersionText: String {
-    let info = Bundle.main.infoDictionary
-    let version = info?["CFBundleShortVersionString"] as? String ?? "Unknown"
-    return "Version \(version)"
   }
 
   private func playPreviewTone(named rawValue: String) {

@@ -93,8 +93,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
     }
 
     let alert = NSAlert()
-    alert.messageText = "Launch Tock at login?"
-    alert.informativeText = "You can change this later in Settings."
+    alert.messageText = "Launch Tock at Login?"
+    alert.informativeText = "This can be changed later in Settings."
     alert.addButton(withTitle: "Add")
     alert.addButton(withTitle: "Not now")
     NSApp.activate(ignoringOtherApps: true)
@@ -205,6 +205,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
     let menu = NSMenu()
     menu.autoenablesItems = false
     menu.delegate = self
+    menu.showsStateColumn = false
     let openItem = NSMenuItem(title: "Open", action: #selector(openTimerFromMenu), keyEquivalent: "t")
     openItem.target = self
     menu.addItem(openItem)
@@ -227,15 +228,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
 
     menu.addItem(.separator())
 
-    let settingsItem = NSMenuItem(title: "Settings", action: #selector(openSettingsFromMenu), keyEquivalent: ",")
-    settingsItem.keyEquivalentModifierMask = [.command]
-    settingsItem.target = self
-    menu.addItem(settingsItem)
+    let aboutItem = NSMenuItem(
+      title: "About Tock",
+      action: #selector(openAboutFromMenu),
+      keyEquivalent: ""
+    )
+    aboutItem.target = self
+    menu.addItem(aboutItem)
 
     if isDebugBuild {
-      menu.addItem(.separator())
       let resetPromptItem = NSMenuItem(
-        title: "Reset Launch at Login Prompt",
+        title: "Reset launch prompt",
         action: #selector(resetLaunchAtLoginPrompt),
         keyEquivalent: ""
       )
@@ -243,6 +246,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
       menu.addItem(resetPromptItem)
     }
 
+    let settingsItem = NSMenuItem(title: "Settings...", action: #selector(openSettingsFromMenu), keyEquivalent: ",")
+    settingsItem.keyEquivalentModifierMask = [.command]
+    settingsItem.target = self
+    menu.addItem(settingsItem)
+
+    menu.addItem(.separator())
     let quitItem = NSMenuItem(title: "Quit Tock", action: #selector(quitApp), keyEquivalent: "q")
     quitItem.target = self
     menu.addItem(quitItem)
@@ -323,6 +332,41 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
   @objc private func openSettingsFromMenu() {
     popover.performClose(nil)
     SettingsWindowController.shared.show()
+  }
+
+  @objc private func openAboutFromMenu() {
+    NSApp.activate(ignoringOtherApps: true)
+    NSApp.orderFrontStandardAboutPanel(options: [
+      .credits: Self.aboutCredits()
+    ])
+  }
+
+  private static func aboutCredits() -> NSAttributedString {
+    let items: [(String, String)] = [
+      ("Help", "https://edelstone.github.io/tock/help/"),
+      ("Report an Issue", "https://github.com/edelstone/tock/issues"),
+      ("License", "https://github.com/edelstone/tock/blob/main/LICENSE")
+    ]
+    let result = NSMutableAttributedString()
+    let paragraphStyle = NSMutableParagraphStyle()
+    paragraphStyle.alignment = .center
+    paragraphStyle.lineSpacing = 4
+    let font = NSFont.systemFont(ofSize: 14, weight: .regular)
+    for (index, item) in items.enumerated() {
+      let (title, urlString) = item
+      let attributes: [NSAttributedString.Key: Any] = [
+        .link: urlString,
+        .font: font,
+        .paragraphStyle: paragraphStyle
+      ]
+      result.append(NSAttributedString(string: title, attributes: attributes))
+      if index < items.count - 1 {
+        result.append(NSAttributedString(string: "\n"))
+      }
+    }
+    result.insert(NSAttributedString(string: "\n"), at: 0)
+    result.append(NSAttributedString(string: "\n"))
+    return result
   }
 
   func openSettingsFromCommand() {

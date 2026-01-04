@@ -35,7 +35,6 @@ Use this flow for the official non–App Store release. It produces a signed, no
 3. Build a DMG from the notarized app.
 
    ```bash
-   set -e
    cd /path/to/tock
    rm -rf dist
    mkdir -p dist

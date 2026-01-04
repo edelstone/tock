@@ -19,7 +19,7 @@
 <body>
   <header class="header">
     <h1>Tock</h1>
-    <p class="tagline">The super-minimal menu bar timer you&rsquo;ll barely notice.</p>
+    <p class="tagline">The super-minimal menu bar timer you’ll barely notice.</p>
     <video class="visual" src="assets/video/app.mp4" poster="assets/img/app.png" autoplay loop muted playsinline preload="metadata" aria-hidden="true" width="800" height="309">
     </video>
     <div class="cta">
@@ -32,6 +32,14 @@
       <h2 class="section-title">Features</h2>
       <div class="feature-grid">
         <div class="feature-item">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-layout-navbar">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+            <path d="M4 6a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2l0 -12" />
+            <path d="M4 9l16 0" />
+          </svg>
+          <p>Lives in the menu bar</p>
+        </div>
+        <div class="feature-item">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-text-recognition">
             <path stroke="none" d="M0 0h24v24H0z" fill="none" />
             <path d="M4 8v-2a2 2 0 0 1 2 -2h2" />
@@ -42,14 +50,6 @@
             <path d="M9 9h6" />
           </svg>
           <p>Plain-language time entry</p>
-        </div>
-        <div class="feature-item">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-layout-navbar">
-            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-            <path d="M4 6a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2l0 -12" />
-            <path d="M4 9l16 0" />
-          </svg>
-          <p>Lives in the menu bar</p>
         </div>
         <div class="feature-item">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-player-play">
@@ -112,7 +112,7 @@
           const version = data.tag_name.replace(/^v/, "");
           meta.textContent = `v${version}`;
         })
-        .catch(() => {});
+        .catch(() => { });
     })();
   </script>
 </body>
