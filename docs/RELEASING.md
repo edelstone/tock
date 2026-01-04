@@ -18,13 +18,12 @@ Use this flow for the official non–App Store release. It produces a signed, no
 
 1. Archive and notarize the app in Xcode.
    - Xcode → Target `Tock` → Signing & Capabilities:
-     - Select Release tab (not Debug/All).
+     - Release tab (not Debug/All)
      - Automatically manage signing: off
      - Provisioning profile: none
      - Team: your paid team
      - Signing Certificate: Developer ID Application
    - Product → Archive
-   - Archive builds
    - Archive Organizer → Distribute App → Direct Distribution
    - Wait for notarization to succeed, then export `Tock.app`.
 2. Verify the exported app passes Gatekeeper.
@@ -47,7 +46,7 @@ Use this flow for the official non–App Store release. It produces a signed, no
    - `SIGNING_IDENTITY` is required; the script will fail if it is missing.
 
 4. Notarize the DMG with `notarytool`.
-   - One-time setup (stores credentials in Keychain):
+   - One-time setup (per machine, run once):
 
      ```bash
      xcrun notarytool store-credentials "tock-notary"

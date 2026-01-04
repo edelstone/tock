@@ -3,7 +3,7 @@
   --font-base: "Manrope", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --radius-base: 8px;
   --color-bg: #f3e6d3;
-  --color-bg-muted: #dbcfbe;
+  --color-shade: rgba(0, 0, 0, 0.1);
   --color-text: #222222;
   --color-accent: #434343;
   --color-reverse-text: #f3e6d3;
@@ -79,22 +79,31 @@ a:not(.button):hover {
 
 .cta {
   display: grid;
-  grid-auto-flow: column;
+  grid-template-columns: auto auto;
+  grid-template-rows: auto auto;
   justify-content: center;
-  gap: .75rem;
-  align-items: start;
+  column-gap: .75rem;
+  row-gap: .25rem;
+  align-items: stretch;
 }
 
-.download-cta {
-  display: grid;
-  gap: .25rem;
-  justify-items: center;
+.button-download {
+  grid-column: 1;
+  grid-row: 1;
 }
 
 .download-meta {
+  grid-column: 1;
+  grid-row: 2;
+  justify-self: center;
   margin: 0;
   font-size: .75rem;
   color: var(--color-accent);
+}
+
+.cta .button-secondary {
+  grid-column: 2;
+  grid-row: 1;
 }
 
 .button {
@@ -117,7 +126,7 @@ a:not(.button):hover {
 }
 
 .button-secondary {
-  background-color: var(--color-bg-muted);
+  background-color: var(--color-shade);
   color: var(--color-text);
 }
 
@@ -129,7 +138,7 @@ a:not(.button):hover {
 .feature-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 2.5rem 3.5rem;
+  gap: 3rem 4rem;
   align-items: start;
 }
 
