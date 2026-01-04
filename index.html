@@ -97,7 +97,8 @@
   <script>
     (function () {
       const meta = document.querySelector("[data-version]");
-      if (!meta) {
+      const download = document.querySelector(".button-download");
+      if (!meta && !download) {
         return;
       }
 
@@ -110,7 +111,15 @@
             return;
           }
           const version = data.tag_name.replace(/^v/, "");
-          meta.textContent = `v${version}`;
+          if (meta) {
+            meta.textContent = `v${version}`;
+          }
+          if (download && Array.isArray(data.assets)) {
+            const dmg = data.assets.find((asset) => asset.name === "Tock.dmg");
+            if (dmg && dmg.browser_download_url) {
+              download.href = dmg.browser_download_url;
+            }
+          }
         })
         .catch(() => { });
     })();
