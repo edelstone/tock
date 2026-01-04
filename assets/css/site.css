@@ -68,14 +68,13 @@ a:not(.button) {
 }
 
 .visual {
-  margin: 2.5rem 0;
+  margin: 2.5rem auto;
   border: 2px solid var(--color-accent);
+  box-shadow: inset 0 0 0 2px var(--color-accent);
   border-radius: var(--radius-lg);
   max-width: 28rem;
   width: 100%;
   height: auto;
-  aspect-ratio: 2.6 / 1;
-  object-fit: cover;
 }
 
 .cta {
