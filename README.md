@@ -2,7 +2,7 @@
 
 <img src="Tock/AppIcon.png" alt="Tock app icon" width="128">
 
-Super-minimal menu bar timer with natural-language parsing, stopwatch mode, and configurable repeating tones.
+Super-minimal menu bar timer for macOS, with natural-language parsing, stopwatch mode, and configurable repeating tones.
 
 ## Features
 
