@@ -80,6 +80,8 @@ Use this flow for the official non–App Store release. It produces a signed, no
 
 ## Publish a release (GitHub)
 
+If you only incremented the build number (same version/tag), start at step 4 and re-upload the DMG.
+
 1. Commit and push all release changes.
 2. Create and push a lightweight tag with the next sequential version number.
    - `git tag v0.1.0`
