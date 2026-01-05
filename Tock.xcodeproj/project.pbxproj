@@ -35,6 +35,7 @@
 		AAAABBBB0000000000000038 /* KeyboardShortcutsNames.swift in Sources */ = {isa = PBXBuildFile; fileRef = 292929290000000000000029 /* KeyboardShortcutsNames.swift */; };
 		AAAABBBB0000000000000039 /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 3A3A3A3A000000000000003A /* KeyboardShortcuts */; };
 		AAAABBBB000000000000003A /* KeyboardShortcutsRecorderRepresentable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A2A2A2A000000000000002A /* KeyboardShortcutsRecorderRepresentable.swift */; };
+		AAAABBBB0000000000000040 /* NotificationIdentifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 343434340000000000000034 /* NotificationIdentifiers.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -62,6 +63,7 @@
 		292929290000000000000029 /* KeyboardShortcutsNames.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardShortcutsNames.swift; sourceTree = "<group>"; };
 		2A2A2A2A000000000000002A /* KeyboardShortcutsRecorderRepresentable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardShortcutsRecorderRepresentable.swift; sourceTree = "<group>"; };
 		333333330000000000000009 /* TockModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TockModel.swift; sourceTree = "<group>"; };
+		343434340000000000000034 /* NotificationIdentifiers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationIdentifiers.swift; sourceTree = "<group>"; };
 		44444444000000000000000A /* TockMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TockMenuView.swift; sourceTree = "<group>"; };
 		55555555000000000000000B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		77777777000000000000000D /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
@@ -96,6 +98,7 @@
 				131313130000000000000013 /* AppDelegate.swift */,
 				333333330000000000000009 /* TockModel.swift */,
 				44444444000000000000000A /* TockMenuView.swift */,
+				343434340000000000000034 /* NotificationIdentifiers.swift */,
 				161616160000000000000016 /* TockSettings.swift */,
 				171717170000000000000017 /* TockSettingsView.swift */,
 				262626260000000000000026 /* Hotkey.swift */,
@@ -236,6 +239,7 @@
 				AAAABBBB000000000000003A /* KeyboardShortcutsRecorderRepresentable.swift in Sources */,
 				AAAABBBB0000000000000027 /* SettingsWindowController.swift in Sources */,
 				AAAABBBB0000000000000018 /* MenuDismissAction.swift in Sources */,
+				AAAABBBB0000000000000040 /* NotificationIdentifiers.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -342,13 +346,13 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = P7634JLM4V;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = Tock/Info.plist;
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 0.1.25;
+				MARKETING_VERSION = 0.1.26;
 				PRODUCT_BUNDLE_IDENTIFIER = com.michaeledelstone.tock;
 				PRODUCT_NAME = Tock;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -363,14 +367,14 @@
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Developer ID Application";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=macosx*]" = P7634JLM4V;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = Tock/Info.plist;
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 0.1.25;
+				MARKETING_VERSION = 0.1.26;
 				PRODUCT_BUNDLE_IDENTIFIER = com.michaeledelstone.tock;
 				PRODUCT_NAME = Tock;
 				PROVISIONING_PROFILE_SPECIFIER = "";

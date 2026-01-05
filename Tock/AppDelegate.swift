@@ -25,6 +25,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
   private var stopwatchItem: NSMenuItem?
   private var pauseItem: NSMenuItem?
   private var clearItem: NSMenuItem?
+  private var repeatItem: NSMenuItem?
   private var eventMonitor: Any?
   private var keyMonitor: Any?
   private var lastStatusItemState: StatusItemState?
@@ -68,6 +69,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
     bindModel()
     updateStatusItem()
     configureHotkeys()
+    configureNotificationCategories()
     UNUserNotificationCenter.current().delegate = self
     DispatchQueue.main.async { [weak self] in
       self?.promptForLaunchAtLoginIfNeeded()
@@ -182,6 +184,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
     }
   }
 
+  private func showPopoverFromNotification() {
+    guard !popover.isShown, let button = statusItem.button else { return }
+    NotificationCenter.default.post(name: Self.popoverWillShowNotification, object: nil)
+    popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
+    startEventMonitors()
+  }
+
   private func togglePopoverFromHotKey() {
     guard let button = statusItem.button else { return }
     togglePopover(button)
@@ -202,6 +211,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
   }
 
   private func showContextMenu() {
+    popover.performClose(nil)
     let menu = NSMenu()
     menu.autoenablesItems = false
     menu.delegate = self
@@ -226,15 +236,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
     menu.addItem(stopItem)
     clearItem = stopItem
 
-    menu.addItem(.separator())
+    if model.canRepeat {
+      let repeatItem = NSMenuItem(title: "Repeat", action: #selector(repeatTimerFromMenu), keyEquivalent: "r")
+      repeatItem.target = self
+      menu.addItem(repeatItem)
+      self.repeatItem = repeatItem
+    }
 
-    let aboutItem = NSMenuItem(
-      title: "About Tock",
-      action: #selector(openAboutFromMenu),
-      keyEquivalent: ""
-    )
-    aboutItem.target = self
-    menu.addItem(aboutItem)
+    menu.addItem(.separator())
 
     if isDebugBuild {
       let resetPromptItem = NSMenuItem(
@@ -251,6 +260,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
     settingsItem.target = self
     menu.addItem(settingsItem)
 
+    let aboutItem = NSMenuItem(
+      title: "About Tock",
+      action: #selector(openAboutFromMenu),
+      keyEquivalent: ""
+    )
+    aboutItem.target = self
+    menu.addItem(aboutItem)
+
     menu.addItem(.separator())
     let quitItem = NSMenuItem(title: "Quit Tock", action: #selector(quitApp), keyEquivalent: "q")
     quitItem.target = self
@@ -264,21 +281,37 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
   }
 
   private func updateContextMenuItems() {
-    guard contextMenu != nil else { return }
-    stopwatchItem?.isEnabled = !model.isRunning || model.isCountdownFinished
+    guard let menu = contextMenu else { return }
+    stopwatchItem?.isEnabled = !model.isRunning || model.isFinished
     let pauseAllowed = !model.isTimeOfDayCountdown
-    pauseItem?.isEnabled = model.isRunning && !model.isCountdownFinished && (model.isPaused || pauseAllowed)
+    pauseItem?.isEnabled = model.isRunning && !model.isFinished && (model.isPaused || pauseAllowed)
     clearItem?.isEnabled = model.isRunning
     applyHotkeyHint(for: .open, to: openItem)
     applyHotkeyHint(for: .pauseResume, to: pauseItem)
     applyHotkeyHint(for: .clear, to: clearItem)
 
-    if model.isPaused {
+    if model.isPaused && !model.isFinished {
       pauseItem?.title = "Restart"
       pauseItem?.action = #selector(restartTimerFromMenu)
     } else {
       pauseItem?.title = "Pause"
       pauseItem?.action = #selector(pauseTimerFromMenu)
+    }
+
+    if model.canRepeat {
+      if repeatItem == nil {
+        let item = NSMenuItem(title: "Repeat", action: #selector(repeatTimerFromMenu), keyEquivalent: "r")
+        item.target = self
+        if let clearItem, menu.index(of: clearItem) != -1 {
+          menu.insertItem(item, at: menu.index(of: clearItem) + 1)
+        } else {
+          menu.addItem(item)
+        }
+        repeatItem = item
+      }
+    } else if let repeatItem {
+      menu.removeItem(repeatItem)
+      self.repeatItem = nil
     }
   }
 
@@ -289,6 +322,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
       stopwatchItem = nil
       pauseItem = nil
       clearItem = nil
+      repeatItem = nil
     }
   }
 
@@ -327,6 +361,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
   @objc private func stopTimerFromMenu() {
     model.stop()
     popover.performClose(nil)
+  }
+
+  @objc private func repeatTimerFromMenu() {
+    if model.repeatLastInput() {
+      popover.performClose(nil)
+    }
   }
 
   @objc private func openSettingsFromMenu() {
@@ -382,6 +422,24 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
     reloadHotkeysFromDefaults()
     observeHotkeyDefaults()
     observeHotkeyChanges()
+  }
+
+  private func configureNotificationCategories() {
+    let clearAction = UNNotificationAction(
+      identifier: NotificationIdentifiers.clearAction,
+      title: "Clear"
+    )
+    let repeatAction = UNNotificationAction(
+      identifier: NotificationIdentifiers.repeatAction,
+      title: "Repeat"
+    )
+    let category = UNNotificationCategory(
+      identifier: NotificationIdentifiers.timerFinishedCategory,
+      actions: [clearAction, repeatAction],
+      intentIdentifiers: [],
+      options: []
+    )
+    UNUserNotificationCenter.current().setNotificationCategories([category])
   }
 
   private func observeHotkeyDefaults() {
@@ -622,5 +680,27 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
     willPresent notification: UNNotification
   ) async -> UNNotificationPresentationOptions {
     return [.banner, .list]
+  }
+
+  nonisolated func userNotificationCenter(
+    _ center: UNUserNotificationCenter,
+    didReceive response: UNNotificationResponse
+  ) async {
+    switch response.actionIdentifier {
+    case NotificationIdentifiers.clearAction:
+      Task { @MainActor in
+        self.model.stop()
+      }
+    case NotificationIdentifiers.repeatAction:
+      Task { @MainActor in
+        _ = self.model.repeatLastInput()
+      }
+    case UNNotificationDefaultActionIdentifier:
+      Task { @MainActor in
+        self.showPopoverFromNotification()
+      }
+    default:
+      break
+    }
   }
 }

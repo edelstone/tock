@@ -18,6 +18,8 @@
 	<string>public.app-category.productivity</string>
 	<key>LSUIElement</key>
 	<true/>
+	<key>LSMultipleInstancesProhibited</key>
+	<true/>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
 </dict>

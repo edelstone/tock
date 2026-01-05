@@ -8,7 +8,7 @@ Super-minimal menu bar timer for macOS, with natural-language parsing, stopwatch
 
 - Menu bar countdown timer and stopwatch with natural-language input.
 - Flexible notifications: banners, multiple tones, repeat behavior, and volume.
-- Context (right-click) menu with most app controls, plus popover UI.
+- Popover UI and complete context (right-click) menu.
 - Customizable interface elements and global keyboard shortcuts.
 
 ## Requirements
@@ -22,7 +22,7 @@ Super-minimal menu bar timer for macOS, with natural-language parsing, stopwatch
    [![Download](https://img.shields.io/github/v/release/edelstone/tock?label=Download&logo=apple&style=for-the-badge&color=5865f2)](https://github.com/edelstone/tock/releases/latest/download/Tock.dmg)
 
 2. Drag `Tock.app` to `/Applications`.
-3. On first launch, you'll be prompted to add Tock to your login items. You can change this later in Settings or System Settings → General → Login Items & Extensions.
+3. On first launch, you may be prompted to add Tock to your login items. You can change this later in Settings or System Settings → General → Login Items & Extensions.
 
 ## Releasing
 

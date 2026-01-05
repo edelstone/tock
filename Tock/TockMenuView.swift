@@ -102,7 +102,7 @@ struct TockMenuView: View {
 
       let pauseDisabled = model.isRunning && !model.isPaused && model.isTimeOfDayCountdown
 
-      HStack(spacing: 6) {
+      HStack(spacing: 2) {
         Button {
           SettingsWindowController.shared.show()
           dismiss()
@@ -120,10 +120,28 @@ struct TockMenuView: View {
         .buttonStyle(HoverPillButtonStyle())
 
         Spacer()
+        if model.canRepeat {
+          Button {
+            if model.repeatLastInput() {
+              dismiss()
+            }
+          } label: {
+            Image("repeat")
+              .renderingMode(.template)
+              .resizable()
+              .scaledToFit()
+              .frame(width: buttonSize.iconPointSize, height: buttonSize.iconPointSize)
+              .frame(width: buttonSize.buttonPointSize, height: buttonSize.buttonPointSize)
+              .foregroundStyle(style.color)
+              .opacity(style.opacity)
+              .shadow(color: style.shadowColor, radius: style.shadowRadius)
+          }
+          .buttonStyle(HoverPillButtonStyle())
+        }
         Button {
           if model.isRunning {
             if model.isPaused {
-              if model.isCountdownFinished {
+              if model.isFinished {
                 model.startStopwatch()
                 dismiss()
               } else {

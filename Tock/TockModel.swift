@@ -19,8 +19,10 @@ final class TockModel: ObservableObject {
   @Published var mode: TimerMode = .countdown
   @Published var isRunning = false
   @Published var isPaused = false
+  @Published var isFinished = false
   @Published var inputDuration = ""
   @Published private(set) var isTimeOfDayCountdown = false
+  @Published private(set) var canRepeat = false
 
   private var timer: Timer?
   private var targetDate: Date?
@@ -34,6 +36,7 @@ final class TockModel: ObservableObject {
   private let alarmMinInterval: TimeInterval = 0.1
   private var lastDisplayedSecond: Int?
   private var notificationContext: NotificationContext?
+  private var lastInput: String?
 
   var formattedRemaining: String {
     let total: Int
@@ -52,12 +55,8 @@ final class TockModel: ObservableObject {
     return String(format: "%02d:%02d", minutes, seconds)
   }
 
-  var isCountdownFinished: Bool {
-    mode == .countdown && isRunning && isPaused && remaining == 0
-  }
-
   var timeOfDayEndTooltip: String? {
-    guard isRunning, mode == .countdown, isTimeOfDayCountdown, !isCountdownFinished else { return nil }
+    guard isRunning, mode == .countdown, isTimeOfDayCountdown, !isFinished else { return nil }
     guard let targetDate else { return nil }
     let formatter = DateFormatter()
     formatter.locale = Locale.current
@@ -78,6 +77,7 @@ final class TockModel: ObservableObject {
     guard !trimmed.isEmpty else { return false }
     if trimmed == "sw" || trimmed == "stopwatch" {
       notificationContext = nil
+      lastInput = nil
       startStopwatch()
       inputDuration = ""
       return true
@@ -85,14 +85,18 @@ final class TockModel: ObservableObject {
     if let interval = parsedTimeOfDayInterval(from: trimmed) {
       notificationContext = .timeOfDay(rawInput)
       start(duration: interval, isTimeOfDay: true)
+      lastInput = rawInput
       inputDuration = ""
+      updateRepeatAvailability()
       return true
     }
     let duration = parsedDuration(from: trimmed)
     guard duration > 0 else { return false }
     notificationContext = .duration(duration)
     start(duration: duration, isTimeOfDay: false)
+    lastInput = rawInput
     inputDuration = ""
+    updateRepeatAvailability()
     return true
   }
 
@@ -102,6 +106,7 @@ final class TockModel: ObservableObject {
     remaining = duration
     isRunning = true
     isPaused = false
+    isFinished = false
     isTimeOfDayCountdown = isTimeOfDay
     targetDate = Date().addingTimeInterval(duration)
     if isTimeOfDay {
@@ -121,6 +126,7 @@ final class TockModel: ObservableObject {
     elapsed = 0
     isRunning = true
     isPaused = false
+    isFinished = false
     isTimeOfDayCountdown = false
     startDate = Date()
     lastDisplayedSecond = nil
@@ -138,6 +144,7 @@ final class TockModel: ObservableObject {
   func resume() {
     guard isRunning, isPaused else { return }
     stopAlarm()
+    guard !isFinished else { return }
     switch mode {
     case .countdown:
       guard remaining > 0 else { return }
@@ -161,13 +168,16 @@ final class TockModel: ObservableObject {
     isRunning = false
     isPaused = false
     isTimeOfDayCountdown = false
+    isFinished = false
     remaining = 0
     elapsed = 0
     inputDuration = ""
+    lastInput = nil
     mode = .countdown
     lastDisplayedSecond = nil
     notificationContext = nil
     stopAlarm()
+    updateRepeatAvailability()
   }
 
   private func parsedDuration(from input: String) -> TimeInterval {
@@ -407,12 +417,14 @@ final class TockModel: ObservableObject {
     isRunning = true
     isPaused = true
     isTimeOfDayCountdown = false
+    isFinished = true
     targetDate = nil
     mode = .countdown
     let context = notificationContext
     notificationContext = nil
     sendFinishedNotificationIfNeeded(context: context)
     startAlarm()
+    updateRepeatAvailability()
   }
 
   private func sendFinishedNotificationIfNeeded(context: NotificationContext?) {
@@ -432,6 +444,7 @@ final class TockModel: ObservableObject {
     let content = UNMutableNotificationContent()
     content.title = "Timer Finished"
     content.body = body
+    content.categoryIdentifier = NotificationIdentifiers.timerFinishedCategory
 
     let request = UNNotificationRequest(
       identifier: UUID().uuidString,
@@ -529,6 +542,17 @@ final class TockModel: ObservableObject {
     alarmPlayer = nil
     alarmRepeatCount = 0
     alarmRepeatLimit = nil
+  }
+
+  @discardableResult
+  func repeatLastInput() -> Bool {
+    guard let lastInput else { return false }
+    inputDuration = lastInput
+    return startFromInputs()
+  }
+
+  private func updateRepeatAvailability() {
+    canRepeat = isFinished && lastInput != nil
   }
 
   private func currentTone() -> NotificationTone {
