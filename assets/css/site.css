@@ -83,7 +83,7 @@ a:not(.button) {
   border: 2px solid var(--color-accent);
   box-shadow: inset 0 0 0 2px var(--color-accent);
   border-radius: var(--radius-lg);
-  max-width: 26rem;
+  max-width: 28rem;
   width: 100%;
   height: auto;
 }
