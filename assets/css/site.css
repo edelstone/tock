@@ -35,17 +35,14 @@ main {
   gap: 2rem;
 }
 
-:where(p, li) {
-  text-wrap: pretty;
-}
-
 h1 {
   font-size: 4rem;
   font-weight: 200;
   margin: 0;
 }
 
-h2 {
+h2,
+.toc-title {
   font-size: 1.5rem;
   font-weight: 700;
   margin: 0;
@@ -54,6 +51,10 @@ h2 {
 ul,
 ol {
   margin-bottom: 0;
+}
+
+:where(p, li) {
+  text-wrap: pretty;
 }
 
 a:not(.button) {
@@ -185,6 +186,16 @@ a:not(.button) {
 .docs ol,
 .docs p {
   margin: 0;
+}
+
+.docs .toc {
+  display: grid;
+  gap: 1rem;
+}
+
+.docs section,
+.docs h3 {
+  scroll-margin-top: 1rem;
 }
 
 .docs .home-link {

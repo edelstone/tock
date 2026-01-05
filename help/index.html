@@ -29,17 +29,33 @@
     <h1>Docs</h1>
   </header>
   <main>
+    <nav class="toc" aria-label="Table of contents">
+      <p class="toc-title">On this page</p>
+      <ul>
+        <li><a href="#overview">Overview</a></li>
+        <li><a href="#installation">Installation</a></li>
+        <li>
+          <a href="#basic-usage">Basic usage</a>
+          <ul>
+            <li><a href="#countdown">Countdown</a></li>
+            <li><a href="#stopwatch">Stopwatch</a></li>
+          </ul>
+        </li>
+        <li><a href="#context-menu">Context menu</a></li>
+        <li><a href="#settings">Settings</a></li>
+        <li><a href="#keyboard-shortcuts">Keyboard shortcuts</a></li>
+        <li><a href="#support-this-project">Support this project</a></li>
+        <li><a href="#support">Bugs &amp; crashes</a></li>
+      </ul>
+    </nav>
     <section id="overview">
       <h2>Overview</h2>
-      <p>Tock is a super-minimal menu bar timer for macOS. It’s keyboard-driven, supports natural-language input, and intentionally focuses on a single active timer to keep the interface uncluttered. Tock uses macOS system colors and adapts automatically to light or dark mode. Shortcuts, notifications, and interface are all configurable.</p>
+      <p>Tock is a super-minimal menu bar timer for macOS. It’s keyboard-driven, supports natural-language input, and intentionally focuses on a single active timer to keep the interface uncluttered. Tock uses macOS system colors and adapts automatically to light or dark mode. Shortcuts, notifications, and appearance are configurable.</p>
       <p>Tock is free, <a href="https://github.com/edelstone/tock">open source</a>, and does not track or collect data.</p>
-    </section>
-    <section id="requirements">
-      <h2>Requirements</h2>
-      <p>Requires macOS 14 or later.</p>
     </section>
     <section id="installation">
       <h2>Installation</h2>
+      <p><em>Requires macOS 14 or later.</em></p>
       <ol>
         <li>Download and open <strong>Tock.dmg</strong>.</li>
         <li>Drag <strong>Tock</strong> to your Applications folder.</li>
@@ -47,33 +63,35 @@
         <li>macOS may prompt you to add Tock to your login items. You can change this later in Tock settings or System Settings → General → Login Items & Extensions.</li>
       </ol>
     </section>
-    <section id="modes">
-      <h2>Modes</h2>
+    <section id="basic-usage">
+      <h2>Basic usage</h2>
+      <p>Tock supports two timekeeping modes.</p>
       <ul>
         <li><strong>Countdown</strong> — run a timer for a set duration.</li>
         <li><strong>Stopwatch</strong> — count up from zero.</li>
       </ul>
-    </section>
-    <section id="basic-usage-countdown">
-      <h2>Basic usage (Countdown)</h2>
+      <h3 id="countdown">Countdown</h3>
       <p>Start a timer by typing a duration into the Tock popover. Tock accepts flexible, natural inputs like these:</p>
       <ul>
         <li><strong>10, 10m, 10 min</strong> → 10-minute timer</li>
         <li><strong>1h 30m, 1.5 hours</strong> → 1-hour 30-minute timer</li>
         <li><strong>45s, 45 seconds, :45</strong> → 45-second timer</li>
-        <li><strong>6:15 am, 615a</strong> → countdown to that time of day</li>
-        <li><strong>sw, stopwatch</strong> → start a stopwatch</li>
+        <li>You can also count down to a specific time: <strong>6:15 am, 615a</strong></li>
       </ul>
       <p>Press <strong>Return</strong> to start. The active timer replaces any existing one. Duration timers count down to zero, then play a configurable tone and optionally show a notification. Finished timers can be repeated or cleared.</p>
-    </section>
-    <section id="basic-usage-stopwatch">
-      <h2>Basic usage (Stopwatch)</h2>
-      <p>Start a stopwatch by clicking the play button in the Tock popover, or <strong>Stopwatch</strong> in the context menu. Stopwatch timers count up indefinitely until paused or cleared.</p>
+      <h3 id="stopwatch">Stopwatch</h3>
+      <p>Start a stopwatch in a few ways:</p>
+      <ul>
+        <li>Click the play button in the Tock popover</li>
+        <li>Click <strong>Stopwatch</strong> in the context menu</li>
+        <li>Type <strong>sw</strong> or <strong>stopwatch</strong> into the Tock popover</li>
+      </ul>
+      <p>Stopwatch timers count up indefinitely until paused or cleared.</p>
     </section>
     <section id="context-menu">
       <h2>Context menu</h2>
       <ul>
-        <li>Right-click the menu bar icon to access controls.</li>
+        <li>Access controls by right-clicking the menu bar icon.</li>
         <li>Start, pause, or clear the timer without opening the app.</li>
         <li>Repeat the last timer (visible when a timer has finished).</li>
         <li>Access Settings.</li>
@@ -86,7 +104,7 @@
         <li><strong>Launch Tock at Login</strong> — start Tock automatically when you sign in.</li>
         <li><strong>Show Notifications</strong> — enable notification banners for timer completion.</li>
         <li><strong>Notification Tone</strong> — choose the alert sound.</li>
-        <li><strong>Play Tone</strong> — set how many times the alert repeats.</li>
+        <li><strong>Play Tone</strong> — control how many times the alert plays.</li>
         <li><strong>Volume</strong> — control alert loudness.</li>
         <li><strong>Default Unit</strong> — unit of time used when none is entered.</li>
         <li><strong>Icon Size</strong> — adjust menu bar icon size.</li>
@@ -98,7 +116,8 @@
       </ul>
     </section>
     <section id="keyboard-shortcuts">
-      <h2>Default keyboard shortcuts</h2>
+      <h2>Keyboard shortcuts</h2>
+      <p>All shortcuts are configurable in Settings.</p>
       <ul>
         <li><strong>Open Tock</strong> — ⌃⌥⌘T</li>
         <li><strong>Pause/Resume</strong> — ⌃⌥⌘P</li>
