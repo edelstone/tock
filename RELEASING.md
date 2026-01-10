@@ -95,10 +95,8 @@ Use this flow for the official non–App Store release. It produces a signed, no
      ./scripts/make-dmg.sh "/path/to/Tock.app" "dist/Tock.dmg"
    ```
 
-   - `SIGNING_IDENTITY` is required; the script will fail if it is missing.
-
 5. Notarize the DMG with `notarytool`.
-   - One-time setup (per machine, run once):
+   - One-time setup (per machine, just run once):
 
      ```bash
      xcrun notarytool store-credentials "tock-notary"
