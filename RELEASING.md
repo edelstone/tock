@@ -6,21 +6,22 @@ This guide covers the end-to-end workflows for shipping Tock through supported d
 
 ### App Store (App Store Connect)
 
-- Version = what users see.
-- Build = Apple’s upload counter.
-- Build must increase on every upload, even if Version does not.
-- Increment Version only when you are publishing a new release. For re-uploads, keep Version the same and increment Build.
+- Version = what users see on the App Store.
+- Build = Apple’s internal upload counter.
+- Build must increase on every upload.
+- After a version is live on the App Store, any update (even metadata-only) requires a new version number.
+- You can reuse the same version only until it has been released to the App Store (for example, while in review or pending developer release).
 
 ### DMG (GitHub)
 
 - Version must change for every public DMG.
-- Build is optional and may stay at `1` if Version always changes.
+- Build is optional and may stay at `1` if version always changes.
 
 ### GitHub tags
 
 - One tag = one exact DMG
 - Never replace a DMG under an existing tag.
-- If you rebuild, make a new tag (new Version, or same Version with a build/suffix).
+- If you rebuild, make a new tag (new version, or same version with a build/suffix).
 
 ## Prerequisites
 
@@ -45,20 +46,19 @@ Use this flow for the Mac App Store build (App Store Connect).
    - Bump Build to a new integer _every upload_ (App Store Connect rejects reused build numbers).
 
 2. Archive and upload from Xcode.
-   - Target `Tock` → Signing & Capabilities:
-     - Automatically manage signing: On
-     - Team: your paid team
-     - Signing to run locally: Development
    - Product → Archive
-   - Archive Organizer → Distribute App → App Store Connect → Upload
+   - Archive Organizer → Distribute App → App Store Connect → Distribute
+   - Wait for the upload to finish. Xcode will show a confirmation screen when the build has been successfully delivered to App Store Connect.
 
-3. Complete the release in App Store Connect (the Xcode upload only delivers the build).
-   - App Store Connect → My Apps → Tock.
-   - Click the “+” next to Versions and pick the new version number.
-   - On the new version page, set the build by clicking “Select a build” and choosing the uploaded archive.
-   - Fill any required metadata (What’s New, age rating, etc.) and resolve validation errors.
-   - Click “Submit for Review”.
-   - After approval, click “Release” or enable “Automatically release this version” before submission.
+3. Complete the release in App Store Connect.
+   - App Store Connect → Apps → Tock.
+   - If you haven’t created the version yet, click the “+” button and enter the new version number. Otherwise, just open the existing version record.
+   - On the version page, in the Build section, click “Select a build” (or “+”) and choose the uploaded build.
+   - Fill any required metadata (What’s New, etc.) and resolve validation errors.
+   - Click “Save.”
+   - Click “Add for Review.”
+   - Draft submission window opens. Click “Submit for Review.”
+   - After approval, the app will either go live automatically (if you chose automatic release) or you’ll click “Release This Version” to publish it manually.
 
 ### Signed & notarized DMG
 
