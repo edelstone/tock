@@ -25,7 +25,7 @@
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-4XBKV5LR1Q"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
+    function gtag() { dataLayer.push(arguments); }
     gtag('js', new Date());
 
     gtag('config', 'G-4XBKV5LR1Q');
@@ -43,6 +43,10 @@
       <ul>
         <li><a href="#overview">Overview</a></li>
         <li><a href="#installation">Installation</a></li>
+        <ul>
+          <li><a href="#app-store-download">Mac App Store</a></li>
+          <li><a href="#direct-download">Direct download (DMG)</a></li>
+        </ul>
         <li>
           <a href="#basic-usage">Basic usage</a>
           <ul>
@@ -66,11 +70,16 @@
     <section id="installation">
       <h2>Installation</h2>
       <p><em>Requires macOS 14 or later.</em></p>
+      <h3 id="app-store-download">Mac App Store</h3>
+      <p>Download Tock from the <a class="button-app-store" href="https://apps.apple.com/us/app/tock-timer/id6757497053?mt=12&itscg=30200&itsct=apps_box_link&mttnsubad=6757497053">Mac App Store</a>. Updates are installed automatically by Apple, depending on your App Store settings.</p>
+      <h3 id="direct-download">Direct download (DMG)</h3>
+      <p>This version is downloaded from the Tock website and does not update automatically.</p>
       <ol>
-        <li>Download and open <strong>Tock.dmg</strong>.</li>
+        <li>Go to the <a href="/">Tock homepage</a> and choose <strong>Direct download</strong>.</li>
+        <li>Open <strong>Tock.dmg</strong>.</li>
         <li>Drag <strong>Tock</strong> to your Applications folder.</li>
         <li>Launch Tock. It appears in the menu bar.</li>
-        <li>macOS may prompt you to add Tock to your login items. You can change this later in Tock settings or System Settings → General → Login Items & Extensions.</li>
+        <li>macOS may prompt you to add Tock to your login items. You can change this later in Tock Settings or System Settings → General → Login Items & Extensions.</li>
       </ol>
     </section>
     <section id="basic-usage">
@@ -102,8 +111,9 @@
       <h2>Context menu</h2>
       <ul>
         <li>Access controls by right-clicking the menu bar icon.</li>
-        <li>Start, pause, or clear the timer without opening the app.</li>
-        <li>Repeat the last timer (visible when a timer has finished).</li>
+        <li>Start a stopwatch timer.</li>
+        <li>Pause or clear a timer without opening the app.</li>
+        <li>Repeat the last timer (option visible when a timer has finished).</li>
         <li>Access Settings.</li>
         <li>Access the <strong>About Tock</strong> panel.</li>
         <li>Quit Tock.</li>

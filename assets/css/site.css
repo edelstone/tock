@@ -91,8 +91,15 @@ a:not(.button) {
 
 .cta {
   display: grid;
+  grid-auto-flow: column;
+  align-items: start;
+  gap: .5rem;
+}
+
+.direct-download-group {
+  display: grid;
   justify-items: center;
-  gap: .25rem;
+  gap: .2rem;
 }
 
 .button {
@@ -104,23 +111,44 @@ a:not(.button) {
   transition: opacity 160ms ease-out;
 }
 
-.button:hover {
-  opacity: .9;
-}
-
-.button:active {
-  opacity: 1;
-}
-
-.download-meta {
-  margin: 0;
-  font-size: .75rem;
-  color: var(--color-accent);
+.button-direct {
+  height: 2.5rem;
+  align-content: center;
+  display: grid;
+  padding: 0 1rem;
 }
 
 .button-secondary {
   background-color: var(--color-shade);
   color: var(--color-text);
+}
+
+.button-app-store {
+  transition: opacity 160ms ease-out;
+}
+
+.button:hover {
+  opacity: .9;
+}
+
+.button-app-store:hover {
+  opacity: .8;
+}
+
+.button:active,
+.button-app-store:active {
+  opacity: 1;
+}
+
+.direct-download-meta {
+  margin: 0;
+  font-size: .75rem;
+  color: var(--color-accent);
+}
+
+.app-store-badge {
+  height: 2.5rem;
+  width: auto;
 }
 
 .features {
@@ -220,6 +248,11 @@ a:not(.button) {
 
   .feature-grid {
     grid-template-columns: 1fr;
+  }
+
+  .cta {
+    grid-auto-flow: row;
+    justify-items: center;
   }
 
   .footer {
