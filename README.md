@@ -17,7 +17,7 @@ Requires macOS 14 or later.
 
 ## Installation
 
-### Mac App Store
+### App Store
 
 Download Tock from the [Mac App Store](https://apps.apple.com/us/app/tock-timer/id6757497053).
 
@@ -50,7 +50,7 @@ See [RELEASING.md](RELEASING.md) for the full release workflow.
 
 ## Privacy
 
-Tock app does not collect or track personal data. View the [privacy policy](https://edelstone.github.io/tock/privacy/).
+Tock app does not collect or track personal data. For details, see the [privacy policy](https://edelstone.github.io/tock/privacy/).
 
 ## License
 
