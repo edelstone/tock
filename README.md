@@ -13,15 +13,13 @@ Super-minimal menu bar timer for macOS, with natural-language parsing, stopwatch
 
 ## Requirements
 
-- macOS 14 or later
+Requires macOS 14 or later.
 
 ## Installation
 
-Prefer automatic updates? Use the Mac App Store version.
-
 ### Mac App Store
 
-Download Tock from the [Mac App Store](https://apps.apple.com/us/app/tock-timer/id6757497053). Updates are installed automatically based on your App Store settings.
+Download Tock from the [Mac App Store](https://apps.apple.com/us/app/tock-timer/id6757497053).
 
 ### Direct download (DMG)
 
@@ -52,9 +50,7 @@ See [RELEASING.md](RELEASING.md) for the full release workflow.
 
 ## Privacy
 
-Tock app does not collect or track personal data.
-
-[Privacy policy](https://edelstone.github.io/tock/privacy/)
+Tock app does not collect or track personal data. View the [privacy policy](https://edelstone.github.io/tock/privacy/).
 
 ## License
 
