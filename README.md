@@ -47,7 +47,7 @@ Enjoying Tock? A quick rating or review on the [Mac App Store](https://apps.appl
 
 - [Buy Me a Coffee](https://www.buymeacoffee.com/edelstone)
 - [Cash App](https://cash.app/$edelstone)
-- [Paypal](https://www.paypal.me/edelstone)
+- [PayPal](https://www.paypal.me/edelstone)
 - [Venmo](https://venmo.com/michaeledelstone)
 
 ## Privacy
