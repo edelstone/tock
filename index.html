@@ -45,7 +45,7 @@
         <a class="button button-direct" href="https://github.com/edelstone/tock/releases/latest/download/Tock.dmg">Direct download</a>
         <p class="direct-download-meta" data-version>v—</p>
       </div>
-      <a class="button-app-store" href="https://apps.apple.com/us/app/tock-timer/id6757497053?mt=12&itscg=30200&itsct=apps_box_link&mttnsubad=6757497053">
+      <a class="button-app-store" href="https://apps.apple.com/app/id6757497053">
         <img class="app-store-badge" src="assets/img/app-store-badge.svg" alt="Download on the App Store" width="120" height="40" />
       </a>
     </div>
@@ -144,6 +144,22 @@
           }
         })
         .catch(() => { });
+    })();
+
+    (function () {
+      const appStoreLinks = document.querySelectorAll('a[href*="apps.apple.com/app/id6757497053"]');
+      if (!appStoreLinks.length) {
+        return;
+      }
+
+      const platform = (navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || "";
+      if (!/mac/i.test(platform)) {
+        return;
+      }
+
+      appStoreLinks.forEach((link) => {
+        link.href = "macappstore://apps.apple.com/app/id6757497053";
+      });
     })();
   </script>
 </body>

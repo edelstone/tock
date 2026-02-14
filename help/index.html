@@ -71,7 +71,7 @@
       <h2>Installation</h2>
       <p><em>Requires macOS 14 or later.</em></p>
       <h3 id="app-store-download">App Store</h3>
-      <p>Download Tock from the <a class="button-app-store" href="https://apps.apple.com/us/app/tock-timer/id6757497053?mt=12&itscg=30200&itsct=apps_box_link&mttnsubad=6757497053">Mac App Store</a>. Updates are installed automatically by Apple, depending on your App Store settings.</p>
+      <p>Download Tock from the <a class="button-app-store" href="https://apps.apple.com/app/id6757497053">Mac App Store</a>. Updates are installed automatically by Apple, depending on your App Store settings.</p>
       <h3 id="direct-download">Direct download (DMG)</h3>
       <p>This version is downloaded from the Tock website and does not update automatically.</p>
       <ol>
@@ -148,7 +148,7 @@
     </section>
     <section id="support-this-project">
       <h2>Support this project</h2>
-      <p>Enjoying Tock? A quick rating on the <a href="https://apps.apple.com/us/app/tock-timer/id6757497053?mt=12&itscg=30200&itsct=apps_box_link&mttnsubad=6757497053">Mac App Store</a> helps a lot.</p>
+      <p>Enjoying Tock? A quick rating on the <a href="https://apps.apple.com/app/id6757497053">Mac App Store</a> helps a lot.</p>
       <ul>
         <li><a href="https://www.buymeacoffee.com/edelstone">Buy Me a Coffee</a></li>
         <li><a href="https://cash.app/$edelstone">Cash App</a></li>
@@ -170,6 +170,23 @@
     <a href="https://github.com/edelstone/tock/blob/main/LICENSE">License</a>
     <a href="../privacy/">Privacy policy</a>
   </footer>
+  <script>
+    (function () {
+      const appStoreLinks = document.querySelectorAll('a[href*="apps.apple.com/app/id6757497053"]');
+      if (!appStoreLinks.length) {
+        return;
+      }
+
+      const platform = (navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || "";
+      if (!/mac/i.test(platform)) {
+        return;
+      }
+
+      appStoreLinks.forEach((link) => {
+        link.href = "macappstore://apps.apple.com/app/id6757497053";
+      });
+    })();
+  </script>
 </body>
 
 </html>
