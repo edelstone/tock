@@ -43,7 +43,7 @@ See [RELEASING.md](RELEASING.md) for the full release workflow.
 
 ## Support this project
 
-Enjoying Tock? A quick rating on the [Mac App Store](https://apps.apple.com/us/app/tock-timer/id6757497053?mt=12&itscg=30200&itsct=apps_box_link&mttnsubad=6757497053) helps a lot.
+Enjoying Tock? A quick rating or review on the [Mac App Store](https://apps.apple.com/us/app/tock-timer/id6757497053?mt=12&itscg=30200&itsct=apps_box_link&mttnsubad=6757497053) helps a lot.
 
 - [Buy Me a Coffee](https://www.buymeacoffee.com/edelstone)
 - [Cash App](https://cash.app/$edelstone)
