@@ -30,6 +30,9 @@ Download Tock from the [Mac App Store](https://apps.apple.com/us/app/tock-timer/
 2. Drag `Tock.app` to your Applications folder.
 3. On first launch, you may be prompted to add Tock to your login items. You can change this later in Tock Settings or System Settings → General → Login Items & Extensions.
 
+> [!NOTE]
+> You won't get automatic updates with direct download.
+
 ## Releasing
 
 See [RELEASING.md](RELEASING.md) for the full release workflow.
