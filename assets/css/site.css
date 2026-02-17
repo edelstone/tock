@@ -1,7 +1,8 @@
 :root {
   color-scheme: light;
-  --font-base: "Manrope", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --radius-base: 8px;
+  --font-primary: "Manrope", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --radius-mini: 4px;
+  --radius-primary: 8px;
   --radius-lg: 16px;
   --color-bg: #f3e6d3;
   --color-shade: rgba(0, 0, 0, 0.1);
@@ -23,7 +24,7 @@ body {
   justify-items: center;
   background-color: var(--color-bg);
   text-align: center;
-  font-family: var(--font-base);
+  font-family: var(--font-primary);
   color: var(--color-text);
   font-weight: 500;
   font-size: 1rem;
@@ -51,6 +52,13 @@ h2,
 ul,
 ol {
   margin-bottom: 0;
+}
+
+code {
+  background: var(--color-shade);
+  padding: 0.1rem 0.2rem;
+  border-radius: var(--radius-mini);
+  font-size: 90%;
 }
 
 :where(p, li) {
@@ -104,7 +112,7 @@ a:not(.button) {
 
 .button {
   padding: .5rem 1rem;
-  border-radius: var(--radius-base);
+  border-radius: var(--radius-primary);
   background-color: var(--color-link);
   color: var(--color-reverse-text);
   text-decoration: none;
