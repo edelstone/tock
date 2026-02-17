@@ -128,17 +128,17 @@ Use this flow for the official non–App Store release. It produces a signed, no
 
 1. Commit and push all release changes.
 2. Create and push a lightweight tag with the next sequential version number.
-   - `git tag v0.1.0`
-   - `git push origin v0.1.0`
+   - `git tag vX.Y.Z`
+   - `git push origin vX.Y.Z`
 3. After tag is pushed, GitHub Actions creates a GitHub Release named after the tag.
 4. Upload the signed DMG you produced locally (GitHub Actions does not upload artifacts).
 
    ```bash
    cd /path/to/tock
-   gh release upload v0.1.0 dist/Tock.dmg --clobber
+   gh release upload vX.Y.Z dist/Tock.dmg --clobber
    ```
 
    - If you see “release not found”, wait for GitHub Actions to finish and retry commands.
 5. Add or update release notes.
-   - `gh release edit v0.1.0 --notes $'Highlights:\n- First item\n- Second item'`
+   - `gh release edit vX.Y.Z --notes $'Highlights:\n- First item\n- Second item'`
 6. Download and install the DMG from the GitHub Release. This DMG will match the signed + notarized artifact you uploaded.
