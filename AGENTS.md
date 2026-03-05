@@ -15,12 +15,6 @@
 - Layout note: prefer CSS Grid for layout; avoid Flexbox.
 - URL paths: use relative paths for local dev; `404.html` uses a `<base>` tag + small script to set `/tock/` on GitHub Pages.
 
-## Dev Scripts
-
-- `npm run dev` runs a local static server and Sass watch via `concurrently`.
-- `npm run sass:build` updates `assets/css/site.css` from SCSS.
-- `npm run start` runs the BrowserSync dev server.
-
 ## Docs
 
 - In Markdown, wrap multi-line commands in fenced code blocks with blank lines around them so the MD linter passes.
