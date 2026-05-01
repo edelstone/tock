@@ -59,4 +59,4 @@ Tock app does not collect or track personal data. For details, see the [privacy 
 
 ## License
 
-MIT — free for commercial and personal use.
+MIT, free for commercial and personal use.
