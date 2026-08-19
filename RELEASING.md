@@ -21,12 +21,6 @@ App Store and GitHub releases use independent version numbers. A GitHub DMG may 
 - Build has no significance for GitHub releases and may be reset to `1` or left at whatever value was last used for an App Store release.
 - The DMG version does not need to match the App Store version.
 
-### GitHub tags
-
-- One tag = one exact DMG
-- Never replace a DMG under an existing tag.
-- If you rebuild, make a new tag (new version, or same version with a build/suffix).
-
 ## Prerequisites
 
 - Xcode installed.
@@ -46,7 +40,7 @@ This repo supports two release paths: the Mac App Store flow and the signed + no
 Use this flow for the Mac App Store build (App Store Connect).
 
 1. Set the app version/build in Xcode.
-   - Target `Tock` → General → Version (MARKETING_VERSION) and Build (CURRENT_PROJECT_VERSION).
+   - Target `Tock` → General → Version and Build.
    - Bump Build to a new integer _every upload_ (App Store Connect rejects reused build numbers).
 
 2. Archive and upload from Xcode.
@@ -69,14 +63,13 @@ Use this flow for the Mac App Store build (App Store Connect).
 Use this flow for the official non–App Store release. It produces a signed, notarized, and stapled DMG.
 
 1. Set the app version/build in Xcode for the GitHub release.
-   - Target `Tock` → General → Version (MARKETING_VERSION) and Build (CURRENT_PROJECT_VERSION).
-   - Set Version (MARKETING_VERSION) to the next GitHub release version.
-   - Build (CURRENT_PROJECT_VERSION) has no significance for GitHub releases. Set it to 1 or leave the previous value.
+   - Target `Tock` → General → Version and Build.
+   - Set Version to the next GitHub release version.
+   - Build has no significance for GitHub releases. Set it to 1 or leave the previous value.
    - These values control the app’s reported version everywhere (Finder, About screen, crash logs).
 
 2. Archive and notarize the app in Xcode.
-   - Target `Tock` → Signing & Capabilities:
-     - Build configuration: Release (Archive uses Release by default)
+   - Target `Tock` → Signing & Capabilities → Release:
      - Automatically manage signing: off
      - Provisioning profile: none
      - Team: your paid team
@@ -98,6 +91,8 @@ Use this flow for the official non–App Store release. It produces a signed, no
    ```
 
 5. Build a DMG from the notarized app.
+
+   Replace `YOUR NAME (TEAMID)` with the Developer ID Application identity shown in the Gatekeeper check in step 4.
 
    ```bash
    rm -rf dist
@@ -138,14 +133,15 @@ Use this flow for the official non–App Store release. It produces a signed, no
 #### Publish the release
 
 1. Commit and push all release changes.
-2. Create and push a lightweight tag with the next sequential version number.
+2. Create and push a lightweight tag matching the GitHub release version.
    - `git tag vX.Y.Z`
    - `git push origin vX.Y.Z`
 3. After tag is pushed, GitHub Actions creates a GitHub Release named after the tag.
 4. Upload the signed DMG you produced locally (GitHub Actions does not upload artifacts).
 
+   You should still be in the repository root from the DMG build steps.
+
    ```bash
-   cd /path/to/tock
    gh release upload vX.Y.Z dist/Tock.dmg --clobber
    ```
 
