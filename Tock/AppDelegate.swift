@@ -14,10 +14,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
   private var hotKeyRef: EventHotKeyRef?
   private var pauseResumeHotKeyRef: EventHotKeyRef?
   private var trashHotKeyRef: EventHotKeyRef?
+  private var startPomodoroHotKeyRef: EventHotKeyRef?
   private var hotKeyHandlerRef: EventHandlerRef?
   private var currentOpenHotkey: Hotkey?
   private var currentPauseResumeHotkey: Hotkey?
   private var currentClearHotkey: Hotkey?
+  private var currentStartPomodoroHotkey: Hotkey?
   private var hotkeyDefaultsObserver: NSObjectProtocol?
   private var hotkeyChangeObserver: NSObjectProtocol?
   private var contextMenu: NSMenu?
@@ -26,6 +28,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
   private var pauseItem: NSMenuItem?
   private var clearItem: NSMenuItem?
   private var repeatItem: NSMenuItem?
+  private var pomodoroItem: NSMenuItem?
   private var eventMonitor: Any?
   private var keyMonitor: Any?
   private var lastStatusItemState: StatusItemState?
@@ -39,7 +42,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
 
   private func currentStatusItemState() -> StatusItemState {
     let isRunning = model.isRunning
-    let displayText = isRunning ? model.formattedRemaining : ""
+    let displayText = isRunning ? model.formattedStatusText : ""
     let tooltip = isRunning ? model.timeOfDayEndTooltip : nil
     return StatusItemState(
       isRunning: isRunning,
@@ -64,6 +67,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
     #if DEBUG
     terminateOtherInstances()
     #endif
+    migrateNotificationRepeatDefault()
     configurePopover()
     configureStatusItem()
     bindModel()
@@ -95,7 +99,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
     }
 
     let alert = NSAlert()
-    alert.messageText = "Launch Tock at Login?"
+    alert.messageText = "Launch Tock at login?"
     alert.informativeText = "This can be changed later in Settings."
     alert.addButton(withTitle: "Add")
     alert.addButton(withTitle: "Not now")
@@ -105,6 +109,35 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
     if #available(macOS 13.0, *) {
       try? SMAppService.mainApp.register()
     }
+  }
+
+  private func migrateNotificationRepeatDefault() {
+    let defaults = UserDefaults.standard
+    guard defaults.integer(forKey: TockSettingsKeys.repeatCountMigrationVersion) < 1 else {
+      return
+    }
+
+    let existingInstallationKeys = [
+      TockSettingsKeys.tone,
+      TockSettingsKeys.volume,
+      TockSettingsKeys.defaultUnit,
+      TockSettingsKeys.openHotkey,
+      TockSettingsKeys.pauseResumeHotkey,
+      TockSettingsKeys.clearHotkey,
+      TockSettingsKeys.didPromptLoginItem,
+      TockSettingsKeys.showNotifications,
+      TockSettingsKeys.menuBarIconSize,
+      TockSettingsKeys.menuButtonSize,
+      TockSettingsKeys.menuButtonBrightness,
+    ]
+    let isExistingInstallation = existingInstallationKeys.contains {
+      defaults.object(forKey: $0) != nil
+    }
+
+    if isExistingInstallation, defaults.object(forKey: TockSettingsKeys.repeatCount) == nil {
+      defaults.set(NotificationRepeatOption.ten.rawValue, forKey: TockSettingsKeys.repeatCount)
+    }
+    defaults.set(1, forKey: TockSettingsKeys.repeatCountMigrationVersion)
   }
 
   private func configurePopover() {
@@ -127,10 +160,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
   }
 
   private func bindModel() {
-    Publishers.Merge3(
+    Publishers.Merge5(
       model.$remaining.map { _ in () },
       model.$elapsed.map { _ in () },
-      model.$isRunning.map { _ in () }
+      model.$isRunning.map { _ in () },
+      model.$pomodoroLabel.map { _ in () },
+      model.$pomodoroCompleted.map { _ in () }
     )
       .sink { [weak self] _ in
         DispatchQueue.main.async {
@@ -226,6 +261,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
     menu.addItem(startStopwatchItem)
     stopwatchItem = startStopwatchItem
 
+    let pomodoroItem = NSMenuItem(
+      title: "Pomodoro", action: #selector(startPomodoroFromMenu), keyEquivalent: ""
+    )
+    pomodoroItem.target = self
+    menu.addItem(pomodoroItem)
+    self.pomodoroItem = pomodoroItem
+
     let newPauseItem = NSMenuItem(title: "Pause", action: #selector(pauseTimerFromMenu), keyEquivalent: "")
     newPauseItem.target = self
     menu.addItem(newPauseItem)
@@ -242,7 +284,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
       menu.addItem(repeatItem)
       self.repeatItem = repeatItem
     }
-
     menu.addItem(.separator())
 
     if isDebugBuild {
@@ -282,13 +323,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
 
   private func updateContextMenuItems() {
     guard let menu = contextMenu else { return }
-    stopwatchItem?.isEnabled = !model.isRunning || model.isFinished
+    stopwatchItem?.isEnabled = true
     let pauseAllowed = !model.isTimeOfDayCountdown
     pauseItem?.isEnabled = model.isRunning && !model.isFinished && (model.isPaused || pauseAllowed)
     clearItem?.isEnabled = model.isRunning
     applyHotkeyHint(for: .open, to: openItem)
     applyHotkeyHint(for: .pauseResume, to: pauseItem)
     applyHotkeyHint(for: .clear, to: clearItem)
+    pomodoroItem?.title = "Pomodoro"
+    applyHotkeyHint(for: .startPomodoro, to: pomodoroItem)
 
     if model.isPaused && !model.isFinished {
       pauseItem?.title = "Restart"
@@ -323,6 +366,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
       pauseItem = nil
       clearItem = nil
       repeatItem = nil
+      pomodoroItem = nil
     }
   }
 
@@ -367,6 +411,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
     if model.repeatLastInput() {
       popover.performClose(nil)
     }
+  }
+
+  @objc private func startPomodoroFromMenu() {
+    model.startPomodoro()
   }
 
   @objc private func openSettingsFromMenu() {
@@ -433,13 +481,33 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
       identifier: NotificationIdentifiers.repeatAction,
       title: "Repeat"
     )
-    let category = UNNotificationCategory(
+    let stopPomodoroAction = UNNotificationAction(
+      identifier: NotificationIdentifiers.stopPomodoroAction,
+      title: "Stop Pomodoro"
+    )
+    let timerFinishedCategory = UNNotificationCategory(
       identifier: NotificationIdentifiers.timerFinishedCategory,
       actions: [clearAction, repeatAction],
       intentIdentifiers: [],
       options: []
     )
-    UNUserNotificationCenter.current().setNotificationCategories([category])
+    let pomodoroAdvancingCategory = UNNotificationCategory(
+      identifier: NotificationIdentifiers.pomodoroAdvancingCategory,
+      actions: [stopPomodoroAction],
+      intentIdentifiers: [],
+      options: []
+    )
+    let pomodoroCompleteCategory = UNNotificationCategory(
+      identifier: NotificationIdentifiers.pomodoroCompleteCategory,
+      actions: [clearAction, repeatAction],
+      intentIdentifiers: [],
+      options: []
+    )
+    UNUserNotificationCenter.current().setNotificationCategories([
+      timerFinishedCategory,
+      pomodoroAdvancingCategory,
+      pomodoroCompleteCategory,
+    ])
   }
 
   private func observeHotkeyDefaults() {
@@ -473,6 +541,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
     updateHotkey(.open, newHotkey: Hotkey.load(for: .open))
     updateHotkey(.pauseResume, newHotkey: Hotkey.load(for: .pauseResume))
     updateHotkey(.clear, newHotkey: Hotkey.load(for: .clear))
+    updateHotkey(.startPomodoro, newHotkey: Hotkey.load(for: .startPomodoro))
   }
 
   private func menuBarIconSize() -> NSSize {
@@ -513,6 +582,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
       return currentPauseResumeHotkey
     case .clear:
       return currentClearHotkey
+    case .startPomodoro:
+      return currentStartPomodoroHotkey
     }
   }
 
@@ -524,6 +595,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
       currentPauseResumeHotkey = hotkey
     case .clear:
       currentClearHotkey = hotkey
+    case .startPomodoro:
+      currentStartPomodoroHotkey = hotkey
     }
   }
 
@@ -560,6 +633,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
       pauseResumeHotKeyRef = registeredHotKey
     case .clear:
       trashHotKeyRef = registeredHotKey
+    case .startPomodoro:
+      startPomodoroHotKeyRef = registeredHotKey
     }
 
     installHotkeyHandlerIfNeeded()
@@ -578,6 +653,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
     case .clear:
       hotkeyRef = trashHotKeyRef
       trashHotKeyRef = nil
+    case .startPomodoro:
+      hotkeyRef = startPomodoroHotKeyRef
+      startPomodoroHotKeyRef = nil
     }
     if let hotkeyRef {
       UnregisterEventHotKey(hotkeyRef)
@@ -610,6 +688,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
           appDelegate.togglePauseResumeFromHotKey()
         case .clear:
           appDelegate.trashFromHotKey()
+        case .startPomodoro:
+          appDelegate.model.startPomodoro()
         }
       }
       return noErr
@@ -688,6 +768,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSPopo
   ) async {
     switch response.actionIdentifier {
     case NotificationIdentifiers.clearAction:
+      Task { @MainActor in
+        self.model.stop()
+      }
+    case NotificationIdentifiers.stopPomodoroAction:
       Task { @MainActor in
         self.model.stop()
       }

@@ -1,6 +1,6 @@
-import Foundation
-import AppKit
 import AVFoundation
+import AppKit
+import Foundation
 import UserNotifications
 
 final class TockModel: ObservableObject {
@@ -23,6 +23,9 @@ final class TockModel: ObservableObject {
   @Published var inputDuration = ""
   @Published private(set) var isTimeOfDayCountdown = false
   @Published private(set) var canRepeat = false
+  @Published private(set) var pomodoroSession: PomodoroSession?
+  @Published private(set) var pomodoroLabel: String = ""
+  @Published private(set) var pomodoroCompleted = false
 
   private var timer: Timer?
   private var targetDate: Date?
@@ -55,6 +58,10 @@ final class TockModel: ObservableObject {
     return String(format: "%02d:%02d", minutes, seconds)
   }
 
+  var formattedStatusText: String {
+    pomodoroLabel.isEmpty ? formattedRemaining : "\(pomodoroLabel) \(formattedRemaining)"
+  }
+
   var timeOfDayEndTooltip: String? {
     guard isRunning, mode == .countdown, isTimeOfDayCountdown, !isFinished else { return nil }
     guard let targetDate else { return nil }
@@ -75,6 +82,14 @@ final class TockModel: ObservableObject {
     let rawInput = inputDuration.trimmingCharacters(in: .whitespacesAndNewlines)
     let trimmed = rawInput.lowercased()
     guard !trimmed.isEmpty else { return false }
+    if trimmed == "p" || trimmed == "pom" || trimmed == "pomo" || trimmed == "pomodoro" {
+      notificationContext = nil
+      lastInput = nil
+      startPomodoro()
+      inputDuration = ""
+      return true
+    }
+
     if trimmed == "sw" || trimmed == "stopwatch" {
       notificationContext = nil
       lastInput = nil
@@ -100,6 +115,16 @@ final class TockModel: ObservableObject {
     return true
   }
 
+  func startPomodoro() {
+    let preferences = PomodoroPreferences()
+    let session = PomodoroSession(from: preferences)
+
+    start(duration: session.workDuration, isTimeOfDay: false)
+
+    pomodoroSession = session
+    updatePomodoroLabel()
+  }
+  
   func start(duration: TimeInterval, isTimeOfDay: Bool = false) {
     stop()
     mode = .countdown
@@ -176,6 +201,9 @@ final class TockModel: ObservableObject {
     mode = .countdown
     lastDisplayedSecond = nil
     notificationContext = nil
+    pomodoroSession = nil
+    pomodoroLabel = ""
+    pomodoroCompleted = false
     stopAlarm()
     updateRepeatAvailability()
   }
@@ -229,7 +257,8 @@ final class TockModel: ObservableObject {
         lastUnit = parsedUnit
       } else {
         guard let currentUnit = lastUnit,
-              let nextUnit = nextSmallerUnit(after: currentUnit) else {
+          let nextUnit = nextSmallerUnit(after: currentUnit)
+        else {
           return nil
         }
         total += value * nextUnit.multiplier
@@ -336,7 +365,7 @@ final class TockModel: ObservableObject {
     if !compact.contains(":") {
       let suffix = compact.suffix(2)
       let prefix = compact.dropLast(2)
-      if (suffix == "am" || suffix == "pm"), prefix.count >= 3, prefix.allSatisfy({ $0.isNumber }) {
+      if suffix == "am" || suffix == "pm", prefix.count >= 3, prefix.allSatisfy({ $0.isNumber }) {
         let minutes = prefix.suffix(2)
         let hours = prefix.dropLast(2)
         compact = "\(hours):\(minutes)\(suffix)"
@@ -420,12 +449,51 @@ final class TockModel: ObservableObject {
     isFinished = true
     targetDate = nil
     mode = .countdown
+
+    // Handle Pomodoro auto-advance
+    if var session = pomodoroSession, session.isActive {
+      let completedPhase = session.phaseDescription(includeCycle: session.currentPhase == .work)
+      let nextDuration = session.advanceToNextPhase()
+      pomodoroSession = session
+      updatePomodoroLabel()
+
+      if nextDuration > 0 {
+        let nextPhase = session.phaseDescription(includeCycle: session.currentPhase == .work)
+        sendPomodoroAdvancingNotification(completedPhase: completedPhase, nextPhase: nextPhase)
+
+        // start() calls stop(), so restore the active Pomodoro session afterward.
+        start(duration: nextDuration, isTimeOfDay: false)
+        pomodoroSession = session
+        updatePomodoroLabel()
+        startAlarm()
+        return
+      } else {
+        pomodoroSession = nil
+        pomodoroLabel = ""
+        pomodoroCompleted = true
+        sendPomodoroCompleteNotification(completedPhase: completedPhase)
+        startAlarm()
+        updateRepeatAvailability()
+        return
+      }
+    }
+
     let context = notificationContext
     notificationContext = nil
     sendFinishedNotificationIfNeeded(context: context)
     startAlarm()
     updateRepeatAvailability()
   }
+
+  #if DEBUG
+    func advancePomodoroPhaseForTesting() -> Bool {
+      guard isRunning, !isFinished, mode == .countdown, pomodoroSession?.isActive == true else {
+        return false
+      }
+      finish()
+      return true
+    }
+  #endif
 
   private func sendFinishedNotificationIfNeeded(context: NotificationContext?) {
     guard UserDefaults.standard.bool(forKey: TockSettingsKeys.showNotifications) else { return }
@@ -442,7 +510,7 @@ final class TockModel: ObservableObject {
     }
 
     let content = UNMutableNotificationContent()
-    content.title = "Timer Finished"
+    content.title = "Timer finished"
     content.body = body
     content.categoryIdentifier = NotificationIdentifiers.timerFinishedCategory
 
@@ -452,6 +520,46 @@ final class TockModel: ObservableObject {
       trigger: nil
     )
     UNUserNotificationCenter.current().add(request)
+  }
+
+  private func sendPomodoroAdvancingNotification(completedPhase: String, nextPhase: String) {
+    guard UserDefaults.standard.bool(forKey: TockSettingsKeys.showNotifications) else { return }
+
+    let content = UNMutableNotificationContent()
+    content.title = "Pomodoro"
+    content.body = "\(completedPhase) complete. \(nextPhase) starting."
+    content.categoryIdentifier = NotificationIdentifiers.pomodoroAdvancingCategory
+
+    let request = UNNotificationRequest(
+      identifier: UUID().uuidString,
+      content: content,
+      trigger: nil
+    )
+    UNUserNotificationCenter.current().add(request)
+  }
+
+  private func sendPomodoroCompleteNotification(completedPhase: String) {
+    guard UserDefaults.standard.bool(forKey: TockSettingsKeys.showNotifications) else { return }
+
+    let content = UNMutableNotificationContent()
+    content.title = "Pomodoro"
+    content.body = "\(completedPhase) complete. Session finished."
+    content.categoryIdentifier = NotificationIdentifiers.pomodoroCompleteCategory
+
+    let request = UNNotificationRequest(
+      identifier: UUID().uuidString,
+      content: content,
+      trigger: nil
+    )
+    UNUserNotificationCenter.current().add(request)
+  }
+
+  private func updatePomodoroLabel() {
+    guard let session = pomodoroSession else {
+      pomodoroLabel = ""
+      return
+    }
+    pomodoroLabel = session.displayLabel()
   }
 
   private func formattedDurationDescription(_ duration: TimeInterval) -> String {
@@ -519,7 +627,8 @@ final class TockModel: ObservableObject {
       let repeatTimer = Timer(timeInterval: interval, repeats: true) { [weak self] _ in
         guard let self else { return }
         if let alarmRepeatLimit = self.alarmRepeatLimit,
-           self.alarmRepeatCount >= alarmRepeatLimit {
+          self.alarmRepeatCount >= alarmRepeatLimit
+        {
           self.stopAlarm()
           return
         }
@@ -546,13 +655,17 @@ final class TockModel: ObservableObject {
 
   @discardableResult
   func repeatLastInput() -> Bool {
+    if pomodoroCompleted {
+      startPomodoro()
+      return true
+    }
     guard let lastInput else { return false }
     inputDuration = lastInput
     return startFromInputs()
   }
 
   private func updateRepeatAvailability() {
-    canRepeat = isFinished && lastInput != nil
+    canRepeat = isFinished && (lastInput != nil || pomodoroCompleted)
   }
 
   private func currentTone() -> NotificationTone {
@@ -563,7 +676,8 @@ final class TockModel: ObservableObject {
   private func currentRepeatLimit() -> Int? {
     let defaults = UserDefaults.standard
     let storedValue = defaults.object(forKey: TockSettingsKeys.repeatCount) as? Int
-    let option = NotificationRepeatOption(rawValue: storedValue ?? NotificationRepeatOption.default.rawValue)
+    let option =
+      NotificationRepeatOption(rawValue: storedValue ?? NotificationRepeatOption.default.rawValue)
       ?? .default
     return option.repeatLimit
   }

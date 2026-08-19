@@ -16,6 +16,7 @@ struct TockMenuView: View {
     "1h", "1 hr", "1.5 hrs", "2 hours",
     "3h", "4 hours", "17m 45s", "1h 30m",
     "25:00", "10pm", "6:15a", "noon",
+    "pomodoro",
   ]
 
   private static func randomSuggestion() -> String {
@@ -99,6 +100,15 @@ struct TockMenuView: View {
           isInputFocused = true
         }
       }
+
+      #if DEBUG
+        Button("Advance Pomodoro Phase") {
+          _ = model.advancePomodoroPhaseForTesting()
+        }
+        .frame(maxWidth: .infinity)
+        .disabled(
+          !model.isRunning || model.isPaused || model.isFinished || model.pomodoroSession == nil)
+      #endif
 
       let pauseDisabled = model.isRunning && !model.isPaused && model.isTimeOfDayCountdown
 

@@ -3,16 +3,33 @@ import Foundation
 enum TockSettingsKeys {
   static let tone = "notificationTone"
   static let repeatCount = "notificationRepeatCount"
+  static let repeatCountMigrationVersion = "notificationRepeatCountMigrationVersion"
   static let volume = "notificationVolume"
   static let defaultUnit = "defaultTimeUnit"
   static let openHotkey = "hotkeyOpen"
   static let pauseResumeHotkey = "hotkeyPauseResume"
   static let clearHotkey = "hotkeyClear"
+  static let startPomodoroHotkey = "hotkeyStartPomodoro"
   static let didPromptLoginItem = "didPromptLoginItem"
   static let showNotifications = "showNotifications"
   static let menuBarIconSize = "menuBarIconSize"
   static let menuButtonSize = "menuButtonSize"
   static let menuButtonBrightness = "menuButtonBrightness"
+  static let pomodoroWorkMinutes = "pomodoroWorkMinutes"
+  static let pomodoroShortBreakMinutes = "pomodoroShortBreakMinutes"
+  static let pomodoroLongBreakMinutes = "pomodoroLongBreakMinutes"
+  static let pomodoroCyclesPerSet = "pomodoroCyclesPerSet"
+  static let pomodoroShouldLoop = "pomodoroShouldLoop"
+}
+
+enum PomodoroDefaults {
+  static let workMinutes = 25
+  static let shortBreakMinutes = 5
+  static let longBreakMinutes = 15
+  static let cyclesPerSet = 4
+  static let shouldLoop = false
+  static let maximumDurationMinutes = 480
+  static let maximumCyclesPerSet = 100
 }
 
 enum NotificationTone: String, CaseIterable, Identifiable {
@@ -36,27 +53,27 @@ enum NotificationTone: String, CaseIterable, Identifiable {
   var displayName: String {
     switch self {
     case .alarmFrenzy:
-      return "Alarm Frenzy"
+      return "Alarm frenzy"
     case .discreet:
       return "Discreet"
     case .fingerlicking:
-      return "Finger Licking"
+      return "Finger licking"
     case .gladToKnow:
-      return "Glad to Know"
+      return "Glad to know"
     case .goodMorning:
-      return "Good Morning"
+      return "Good morning"
     case .joyousChime:
-      return "Joyous Chime"
+      return "Joyous chime"
     case .lightHearted:
-      return "Light-Hearted"
+      return "Light-hearted"
     case .openYourEyes:
-      return "Open Your Eyes"
+      return "Open your eyes"
     case .rush:
       return "Rush"
     case .wailing:
       return "Wailing"
     case .wakeUp:
-      return "Wake Up"
+      return "Wake up"
     case .whistling:
       return "Whistling"
     }
@@ -69,7 +86,7 @@ enum NotificationRepeatOption: Int, CaseIterable, Identifiable {
   case ten = 10
   case infinite = -1
 
-  static let `default` = NotificationRepeatOption.ten
+  static let `default` = NotificationRepeatOption.none
 
   var id: Int { rawValue }
 
@@ -78,11 +95,11 @@ enum NotificationRepeatOption: Int, CaseIterable, Identifiable {
     case .none:
       return "Once"
     case .five:
-      return "5 Times"
+      return "5 times"
     case .ten:
-      return "10 Times"
+      return "10 times"
     case .infinite:
-      return "Until Cleared"
+      return "Until cleared"
     }
   }
 
@@ -113,7 +130,7 @@ enum NotificationVolume: String, CaseIterable, Identifiable {
   var displayName: String {
     switch self {
     case .ultraLow:
-      return "Very Low"
+      return "Very low"
     case .low:
       return "Low"
     case .medium:

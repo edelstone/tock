@@ -5,6 +5,7 @@ enum HotkeyAction: CaseIterable {
   case open
   case pauseResume
   case clear
+  case startPomodoro
 
   var id: UInt32 {
     switch self {
@@ -14,6 +15,8 @@ enum HotkeyAction: CaseIterable {
       return 2
     case .clear:
       return 3
+    case .startPomodoro:
+      return 4
     }
   }
 
@@ -25,6 +28,8 @@ enum HotkeyAction: CaseIterable {
       return TockSettingsKeys.pauseResumeHotkey
     case .clear:
       return TockSettingsKeys.clearHotkey
+    case .startPomodoro:
+      return TockSettingsKeys.startPomodoroHotkey
     }
   }
 
@@ -37,6 +42,8 @@ enum HotkeyAction: CaseIterable {
       return Hotkey(keyCode: UInt16(kVK_ANSI_P), modifiers: modifiers)
     case .clear:
       return Hotkey(keyCode: UInt16(kVK_ANSI_X), modifiers: modifiers)
+    case .startPomodoro:
+      return Hotkey(keyCode: UInt16(kVK_ANSI_M), modifiers: modifiers)
     }
   }
 
@@ -48,6 +55,8 @@ enum HotkeyAction: CaseIterable {
       self = .pauseResume
     case HotkeyAction.clear.id:
       self = .clear
+    case HotkeyAction.startPomodoro.id:
+      self = .startPomodoro
     default:
       return nil
     }

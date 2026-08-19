@@ -2,11 +2,12 @@
 
 <img src="Tock/AppIcon.png" alt="Tock app icon" width="128">
 
-Super-minimal menu bar timer for macOS, with natural-language parsing, stopwatch mode, and configurable repeating tones.
+Super-minimal menu bar timer for macOS, with natural-language parsing, stopwatch mode, Pomodoro sessions, and configurable tones.
 
 ## Features
 
 - Menu bar countdown timer and stopwatch with natural-language input.
+- Customizable Pomodoro work and break cycles.
 - Flexible notifications: banners, multiple tones, repeat behavior, and volume.
 - Popover UI and complete context (right-click) menu.
 - Customizable interface elements and global keyboard shortcuts.

@@ -4,6 +4,8 @@ This guide covers the end-to-end workflows for shipping Tock through supported d
 
 ## Version, build, and tag rules
 
+App Store and GitHub releases use independent version numbers. A GitHub DMG may (and should) have a different version from the current App Store release. Xcode may have been left configured for either release channel.
+
 ### App Store (App Store Connect)
 
 - Version = what users see on the App Store.
@@ -14,8 +16,10 @@ This guide covers the end-to-end workflows for shipping Tock through supported d
 
 ### DMG (GitHub)
 
+- Version = the GitHub release version shown to users.
 - Version must change for every public DMG.
-- Build is optional and may stay at `1` if version always changes.
+- Build has no significance for GitHub releases and may be reset to `1` or left at whatever value was last used for an App Store release.
+- The DMG version does not need to match the App Store version.
 
 ### GitHub tags
 
@@ -41,7 +45,7 @@ This repo supports two release paths: the Mac App Store flow and the signed + no
 
 Use this flow for the Mac App Store build (App Store Connect).
 
-1. Bump the app version/build in Xcode.
+1. Set the app version/build in Xcode.
    - Target `Tock` → General → Version (MARKETING_VERSION) and Build (CURRENT_PROJECT_VERSION).
    - Bump Build to a new integer _every upload_ (App Store Connect rejects reused build numbers).
 
@@ -64,8 +68,10 @@ Use this flow for the Mac App Store build (App Store Connect).
 
 Use this flow for the official non–App Store release. It produces a signed, notarized, and stapled DMG.
 
-1. Bump the app version/build in Xcode.
+1. Set the app version/build in Xcode for the GitHub release.
    - Target `Tock` → General → Version (MARKETING_VERSION) and Build (CURRENT_PROJECT_VERSION).
+   - Set Version (MARKETING_VERSION) to the next GitHub release version.
+   - Build (CURRENT_PROJECT_VERSION) has no significance for GitHub releases. Set it to 1 or leave the previous value.
    - These values control the app’s reported version everywhere (Finder, About screen, crash logs).
 
 2. Archive and notarize the app in Xcode.
@@ -77,52 +83,57 @@ Use this flow for the official non–App Store release. It produces a signed, no
      - Signing Certificate: Developer ID Application
    - Product → Archive
    - Archive Organizer → Distribute App → Direct Distribution
-   - Wait for notarization to succeed, then export `Tock.app`.
+   - Wait for notarization to succeed, then export the notarized `Tock.app` to the repository root, alongside the project’s source directory.
 
-3. Verify the exported app passes Gatekeeper.
+3. Change to the repository root and stay there.
 
    ```bash
-   spctl -a -vv /path/to/Tock.app
+   cd /path/to/repository
    ```
 
-4. Build a DMG from the notarized app.
+4. Verify the exported app passes Gatekeeper.
 
    ```bash
-   cd /path/to/tock
+   spctl -a -vv ./Tock.app
+   ```
+
+5. Build a DMG from the notarized app.
+
+   ```bash
    rm -rf dist
    mkdir -p dist
    SIGNING_IDENTITY="Developer ID Application: YOUR NAME (TEAMID)" \
-     ./scripts/make-dmg.sh "/path/to/Tock.app" "dist/Tock.dmg"
+   ./scripts/make-dmg.sh "./Tock.app" "dist/Tock.dmg"
    ```
 
-5. Notarize the DMG with `notarytool`.
+6. Notarize the DMG with `notarytool`.
    - One-time setup (per machine, just run once):
 
      ```bash
      xcrun notarytool store-credentials "tock-notary"
      ```
 
-   - Submit and wait (can take a few minutes):
+   - Submit and wait (this can take a few minutes):
 
      ```bash
      xcrun notarytool submit "dist/Tock.dmg" --keychain-profile "tock-notary" --wait
      ```
 
-6. Staple and validate the DMG.
+7. Staple and validate the DMG.
 
    ```bash
    xcrun stapler staple "dist/Tock.dmg"
    xcrun stapler validate "dist/Tock.dmg"
    ```
 
-7. Final smoke check.
+8. Final smoke check.
    - Mount `dist/Tock.dmg`, drag `Tock.app` to `/Applications`, then:
 
      ```bash
      spctl -a -vv /Applications/Tock.app
      ```
 
-8. Launch `Tock.app` from `/Applications` and verify core behavior, notifications, settings, and shortcuts.
+9. Launch `Tock.app` from `/Applications` and verify core behavior, notifications, settings, shortcuts, and one Pomodoro phase transition.
 
 #### Publish the release
 

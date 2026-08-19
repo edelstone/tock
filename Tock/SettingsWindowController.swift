@@ -18,9 +18,6 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
     NSApp.activate(ignoringOtherApps: true)
     window.makeKeyAndOrderFront(nil)
     window.orderFrontRegardless()
-    DispatchQueue.main.async {
-      window.makeFirstResponder(nil)
-    }
   }
 
   private func ensureWindow() -> NSWindow {
