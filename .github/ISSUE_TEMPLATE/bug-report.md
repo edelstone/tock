@@ -12,6 +12,8 @@ assignees: ""
 **macOS version**
 (e.g. macOS 26.2)
 
+**Did you download Tock from the Mac App Store or somewhere else?**
+
 **What did you expect to happen?**
 
 **What happened instead?**
