@@ -39,9 +39,13 @@ This repo supports two release paths: the Mac App Store flow and the signed + no
 
 Use this flow for the Mac App Store build (App Store Connect).
 
-1. Set the app version/build in Xcode.
+1. Set the app version/build and signing in Xcode.
    - Target `Tock` → `General` → `Version` and `Build`.
    - Bump `Build` to a new integer *every upload* (App Store Connect rejects reused build numbers).
+   - Target `Tock` → `Signing & Capabilities` → `Release`:
+      - Automatically manage signing: on
+      - Team: your paid team
+      - Signing Certificate: Development
 
 2. Archive and upload from Xcode.
    - `Product` → `Archive`
@@ -51,8 +55,8 @@ Use this flow for the Mac App Store build (App Store Connect).
 3. Complete the release in App Store Connect.
    - `App Store Connect` → `Apps` → `Tock`.
    - If you haven’t created the version yet, click the `+` button and enter the new version number. Otherwise, open the existing version record.
-   - On the version page, in the `Build` section, click `Select a build` (or `+`) and choose the uploaded build.
-   - Fill any required metadata (`What’s New`, etc.) and resolve validation errors.
+   - On the version page, in the `Build` section, click `Add build` (or `+`) and choose the uploaded build.
+   - Fill any required metadata (`What’s New`, etc.) and resolve validation or compliance warnings.
    - Click `Save`.
    - Click `Add for Review`.
    - Draft submission window opens. Click `Submit for Review`.
