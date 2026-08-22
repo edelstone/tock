@@ -584,8 +584,7 @@ final class TockModel: ObservableObject {
   }
 
   private func formattedUnit(_ value: Int, unit: String) -> String {
-    let label = value == 1 ? unit : "\(unit)s"
-    return "\(value)-\(label)"
+    return "\(value)-\(unit)"
   }
 
   private func formattedTimeString(for date: Date) -> String {

@@ -12,7 +12,7 @@ App Store and GitHub releases use independent version numbers. A GitHub DMG may 
 - `Build` = Apple’s internal upload counter.
 - `Build` must increase on every upload.
 - After a version is live on the App Store, any update (even metadata-only) requires a new version number.
-- You can reuse the same version only until it has been released to the App Store (for example, while in review or pending developer release).
+- You can reuse the same version number up until it has been released to the App Store (for example, while in review or pending developer release).
 
 ### DMG (GitHub)
 
@@ -80,38 +80,37 @@ Use this flow for the official non–App Store release. It produces a signed, no
      - Signing Certificate: Developer ID Application
    - `Product` → `Archive`
    - `Archive Organizer` → `Distribute App` → `Direct Distribution`
-   - Wait for notarization to succeed, then export the notarized `Tock.app` to the repository root, alongside the project’s source directory.
+   - Wait for notarization to succeed, then export the notarized `Tock.app` to a convenient location, such as your Desktop.
 
-3. Change to the repository root and execute the remainder of the steps from there.
+3. Verify the exported app passes Gatekeeper.
 
    ```bash
-   cd /path/to/repository/root
+   spctl -a -vv /path/to/Tock.app
    ```
 
-   **Personal note:** Use `z tock` to jump directly to the repository root.
+4. Build a DMG from the notarized app.
 
-4. Verify the exported app passes Gatekeeper.
+   Run these commands from the repository root. They:
 
-   ```bash
-   spctl -a -vv ./Tock.app
-   ```
-
-5. Build a DMG from the notarized app.
-
-   Replace `YOUR NAME (TEAMID)` with the Developer ID Application identity shown by the Gatekeeper check in the previous step.
-
-   **Personal note:** You have a `tock-package` shell function that automates this step.
+   - remove any previous `dist` directory
+   - create a fresh `dist` directory
+   - create the signed DMG from the exported `Tock.app`
 
    ```bash
+   cd /path/to/tock/repository
    rm -rf dist
    mkdir -p dist
    SIGNING_IDENTITY="Developer ID Application: YOUR NAME (TEAMID)" \
-   ./scripts/make-dmg.sh "./Tock.app" "dist/Tock.dmg"
+   ./scripts/make-dmg.sh "/path/to/Tock.app" "dist/Tock.dmg"
    ```
 
-6. Notarize the DMG with `notarytool`.
+   Replace `YOUR NAME (TEAMID)` with the Developer ID Application identity shown by the Gatekeeper check in the previous step.
 
-   One-time setup (per machine, just run once):
+   **Note to self:** The `tock-package` shell function automates this step.
+
+5. Notarize the DMG with `notarytool`.
+
+   One-time setup (just run once per machine):
 
    ```bash
    xcrun notarytool store-credentials "tock-notary"
@@ -123,14 +122,14 @@ Use this flow for the official non–App Store release. It produces a signed, no
    xcrun notarytool submit "dist/Tock.dmg" --keychain-profile "tock-notary" --wait
    ```
 
-7. Staple and validate the DMG.
+6. Staple and validate the DMG.
 
    ```bash
    xcrun stapler staple "dist/Tock.dmg"
    xcrun stapler validate "dist/Tock.dmg"
    ```
 
-8. Final smoke check.
+7. Verify the installed app passes Gatekeeper.
 
    Mount `dist/Tock.dmg`, drag `Tock.app` to `/Applications`, then:
 
@@ -138,9 +137,9 @@ Use this flow for the official non–App Store release. It produces a signed, no
    spctl -a -vv /Applications/Tock.app
    ```
 
-9. Launch `Tock.app` from `/Applications`.
+8. Final smoke check.
 
-   Verify core behavior, notifications, settings, shortcuts, and one Pomodoro phase transition.
+   Launch `Tock.app` from `/Applications`. Verify core behavior, notifications, settings, shortcuts, and one Pomodoro phase transition.
 
 #### Publish the release
 
