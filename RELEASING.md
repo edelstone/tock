@@ -90,11 +90,7 @@ Use this flow for the official non–App Store release. It produces a signed, no
 
 4. Build a DMG from the notarized app.
 
-   Run these commands from the repository root. They:
-
-   - remove any previous `dist` directory
-   - create a fresh `dist` directory
-   - create the signed DMG from the exported `Tock.app`
+   Run these commands from the repository root. They remove and recreate `dist`, then build and sign the DMG.
 
    ```bash
    cd /path/to/tock/repository
@@ -104,9 +100,8 @@ Use this flow for the official non–App Store release. It produces a signed, no
    ./scripts/make-dmg.sh "/path/to/Tock.app" "dist/Tock.dmg"
    ```
 
-   Replace `YOUR NAME (TEAMID)` with the Developer ID Application identity shown by the Gatekeeper check in the previous step.
-
-   **Note to self:** The `tock-package` shell function automates this step.
+   - Replace `YOUR NAME (TEAMID)` with the Developer ID Application identity shown by the Gatekeeper check in the previous step.
+   - **Note to self:** The `tock-package` shell function automates this step.
 
 5. Notarize the DMG with `notarytool`.
 
